@@ -44,6 +44,10 @@ class WhisperInputService : InputMethodService(), KeyboardView.OnKeyboardActionL
     }
 
     override fun onCreateInputView(): View {
-        return super.onCreateInputView()
+        keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as KeyboardView
+        keyboard = Keyboard(this, R.xml.key_layout)
+        keyboardView!!.keyboard = keyboard
+        keyboardView!!.setOnKeyboardActionListener(this)
+        return keyboardView!!
     }
 }
