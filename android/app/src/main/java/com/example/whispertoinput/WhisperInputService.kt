@@ -3,8 +3,10 @@ package com.example.whispertoinput
 import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView
-import android.view.KeyboardShortcutInfo
+import android.text.TextUtils
+import android.view.KeyEvent
 import android.view.View
+
 
 class WhisperInputService : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     private var keyboardView : KeyboardView? = null
@@ -12,15 +14,49 @@ class WhisperInputService : InputMethodService(), KeyboardView.OnKeyboardActionL
     private var caps = false
 
     override fun onPress(primaryCode: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onRelease(primaryCode: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
-        TODO("Not yet implemented")
+        val inputConnection = currentInputConnection
+        if (inputConnection != null) {
+            when (primaryCode) {
+                Keyboard.KEYCODE_DELETE -> {
+                    val selectedText = inputConnection.getSelectedText(0)
+                    if (TextUtils.isEmpty(selectedText)) {
+                        inputConnection.deleteSurroundingText(1, 0)
+                    } else {
+                        inputConnection.commitText("", 1)
+                    }
+                    caps = !caps
+                    keyboard!!.isShifted = caps
+                    keyboardView!!.invalidateAllKeys()
+                }
+
+                Keyboard.KEYCODE_SHIFT -> {
+                    caps = !caps
+                    keyboard!!.isShifted = caps
+                    keyboardView!!.invalidateAllKeys()
+                }
+
+                Keyboard.KEYCODE_DONE -> inputConnection.sendKeyEvent(
+                    KeyEvent(
+                        KeyEvent.ACTION_DOWN,
+                        KeyEvent.KEYCODE_ENTER
+                    )
+                )
+
+                else -> {
+                    var code = primaryCode.toChar()
+                    if (Character.isLetter(code) && caps) {
+                        code = code.uppercaseChar()
+                    }
+                    inputConnection.commitText(code.toString(), 1)
+                }
+            }
+        }
     }
 
     override fun onText(text: CharSequence?) {
@@ -28,19 +64,15 @@ class WhisperInputService : InputMethodService(), KeyboardView.OnKeyboardActionL
     }
 
     override fun swipeLeft() {
-        TODO("Not yet implemented")
     }
 
     override fun swipeRight() {
-        TODO("Not yet implemented")
     }
 
     override fun swipeDown() {
-        TODO("Not yet implemented")
     }
 
     override fun swipeUp() {
-        TODO("Not yet implemented")
     }
 
     override fun onCreateInputView(): View {
