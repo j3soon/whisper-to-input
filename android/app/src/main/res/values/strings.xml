@@ -3,5 +3,6 @@
     <string name="enter_text">Enter Text</string>
     <string name="whisper_to_input">Whisper To Input</string>
     <string name="recording">Recording…</string>
+    <string name="transcribing">Transcribing…</string>
     <string name="start_speech_to_text">Start speech-to-text.</string>
 </resources>
