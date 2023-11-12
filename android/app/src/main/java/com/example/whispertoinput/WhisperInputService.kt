@@ -11,7 +11,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 
 class WhisperInputService : InputMethodService()
 {
+    private enum class KeyboardStatus
+    {
+        Idle,       // Ready to start recording
+        Recording,  // Currently recording
+        Waiting,    // Waiting for speech-to-text results
+    }
+
     private var keyboardView : ConstraintLayout? = null
+    private var keyboardStatus : KeyboardStatus = KeyboardStatus.Idle
 
     private fun setupKeyboardView()
     {
