@@ -1,9 +1,6 @@
 package com.example.whispertoinput
 
 import android.inputmethodservice.InputMethodService
-import android.text.TextUtils
-import android.util.Log
-import android.view.KeyEvent
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -59,7 +56,19 @@ class WhisperInputService : InputMethodService()
         if (keyboardStatus == KeyboardStatus.Recording)
         {
             setKeyboardStatus(KeyboardStatus.Waiting)
+            val job = transcribeAsync{ transcriptionCallback(it) }
         }
+    }
+
+    private fun transcriptionCallback(text : String?)
+    {
+        if (text == null)
+        {
+            return
+        }
+
+        currentInputConnection?.commitText(text, text.length)
+        setKeyboardStatus(KeyboardStatus.Idle)
     }
 
     private fun transcribeAsync(callback: (String?) -> Unit) : Job {
