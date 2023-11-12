@@ -132,12 +132,14 @@ class WhisperInputService : InputMethodService()
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 buttonRecordingDone!!.visibility = View.GONE
+                registerTranscriptionJob(null)
             }
             KeyboardStatus.Recording ->
             {
                 labelStatus!!.setText(R.string.recording)
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
                 buttonRecordingDone!!.visibility = View.VISIBLE
+                registerTranscriptionJob(null)
             }
             KeyboardStatus.Waiting ->
             {
