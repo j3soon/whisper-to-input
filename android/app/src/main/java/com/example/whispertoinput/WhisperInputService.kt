@@ -19,17 +19,33 @@ class WhisperInputService : InputMethodService()
     }
 
     private var keyboardView : ConstraintLayout? = null
+    private var buttonMic : ImageButton? = null
     private var keyboardStatus : KeyboardStatus = KeyboardStatus.Idle
 
     private fun setupKeyboardView()
     {
-        val buttonMic = keyboardView!!.getViewById(R.id.btn_mic) as ImageButton
-        buttonMic.setOnClickListener{ onButtonMicClick(it) }
+        buttonMic = keyboardView!!.getViewById(R.id.btn_mic) as ImageButton
+        buttonMic!!.setOnClickListener{ onButtonMicClick(it) }
     }
 
     private fun onButtonMicClick(it: View)
     {
-        val buttonMic = it as ImageButton
+        // Determine the next keyboard status upon mic button click.
+        // Idle -> Start recording
+        // Recording -> Cancel recording
+        // Waiting -> Cancel waiting
+        when (keyboardStatus)
+        {
+            KeyboardStatus.Idle -> setKeyboardStatus(KeyboardStatus.Recording)
+            KeyboardStatus.Recording -> setKeyboardStatus(KeyboardStatus.Idle)
+            KeyboardStatus.Waiting -> setKeyboardStatus(KeyboardStatus.Idle)
+        }
+    }
+
+    private fun setKeyboardStatus(newStatus : KeyboardStatus)
+    {
+        // TODO: Different actions depending on different orig status
+        keyboardStatus = newStatus
     }
 
     override fun onCreateInputView(): View
