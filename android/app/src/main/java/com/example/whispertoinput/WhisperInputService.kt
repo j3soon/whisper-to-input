@@ -22,6 +22,7 @@ class WhisperInputService : InputMethodService()
     private var buttonRecordingDone : ImageButton? = null
     private var labelStatus : TextView? = null
     private var keyboardStatus : KeyboardStatus = KeyboardStatus.Idle
+    private var currentTranscriptionJob : Job? = null
 
     private fun setupKeyboardView()
     {
@@ -56,8 +57,18 @@ class WhisperInputService : InputMethodService()
         if (keyboardStatus == KeyboardStatus.Recording)
         {
             setKeyboardStatus(KeyboardStatus.Waiting)
-            val job = transcribeAsync{ transcriptionCallback(it) }
+            transcribeAsync{ transcriptionCallback(it) }
         }
+    }
+
+    private fun registerTranscriptionJob(job : Job?)
+    {
+        if (currentTranscriptionJob != null)
+        {
+            currentTranscriptionJob!!.cancel()
+        }
+
+        currentTranscriptionJob = job
     }
 
     private fun transcriptionCallback(text : String?)
@@ -71,7 +82,7 @@ class WhisperInputService : InputMethodService()
         setKeyboardStatus(KeyboardStatus.Idle)
     }
 
-    private fun transcribeAsync(callback: (String?) -> Unit) : Job {
+    private fun transcribeAsync(callback: (String?) -> Unit) {
         suspend fun whisperTranscription(): String {
             // TODO: Make Whisper requests to transcribe
             // For now a text is returned after some predetermined time.
@@ -101,7 +112,7 @@ class WhisperInputService : InputMethodService()
             }
         }
 
-        return job
+        registerTranscriptionJob(job)
     }
 
 
