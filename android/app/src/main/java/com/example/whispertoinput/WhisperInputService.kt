@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlinx.coroutines.*
 
 
 class WhisperInputService : InputMethodService()
@@ -59,6 +60,13 @@ class WhisperInputService : InputMethodService()
         {
             setKeyboardStatus(KeyboardStatus.Waiting)
         }
+    }
+
+    private suspend fun whisperTranscription(): String {
+        // TODO: Make Whisper requests to transcribe
+        // For now a text is returned after some predetermined time.
+        delay(3000)
+        return "Text"
     }
 
     private fun setKeyboardStatus(newStatus : KeyboardStatus)
