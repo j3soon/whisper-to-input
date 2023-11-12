@@ -87,7 +87,7 @@ class WhisperInputService : InputMethodService()
             // TODO: Make Whisper requests to transcribe
             // For now a text is returned after some predetermined time.
             delay(3000)
-            return "Text"
+            return "Text 文字文字"
         }
 
         // Create a cancellable job in the main thread (for UI updating)
