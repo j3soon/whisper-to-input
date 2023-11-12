@@ -21,14 +21,19 @@ class WhisperInputService : InputMethodService()
 
     private var keyboardView : ConstraintLayout? = null
     private var buttonMic : ImageButton? = null
+    private var buttonRecordingDone : ImageButton? = null
     private var labelStatus : TextView? = null
     private var keyboardStatus : KeyboardStatus = KeyboardStatus.Idle
 
     private fun setupKeyboardView()
     {
         buttonMic = keyboardView!!.getViewById(R.id.btn_mic) as ImageButton
+        buttonRecordingDone = keyboardView!!.getViewById(R.id.btn_recording_done) as ImageButton
         labelStatus = keyboardView!!.getViewById(R.id.label_status) as TextView
+
+        // Assign onClicks
         buttonMic!!.setOnClickListener{ onButtonMicClick(it) }
+        buttonRecordingDone!!.setOnClickListener{ onButtonRecordingDoneClick(it) }
     }
 
     private fun onButtonMicClick(it: View)
@@ -42,6 +47,17 @@ class WhisperInputService : InputMethodService()
             KeyboardStatus.Idle -> setKeyboardStatus(KeyboardStatus.Recording)
             KeyboardStatus.Recording -> setKeyboardStatus(KeyboardStatus.Idle)
             KeyboardStatus.Waiting -> setKeyboardStatus(KeyboardStatus.Idle)
+        }
+    }
+
+    private fun onButtonRecordingDoneClick(it: View)
+    {
+        // Determine the next keyboard status upon recording_done button click.
+        // Recording -> End recording, start transcribing
+        // else -> nothing
+        if (keyboardStatus == KeyboardStatus.Recording)
+        {
+            setKeyboardStatus(KeyboardStatus.Waiting)
         }
     }
 
@@ -59,17 +75,20 @@ class WhisperInputService : InputMethodService()
             {
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
+                buttonRecordingDone!!.visibility = View.GONE
             }
             KeyboardStatus.Recording ->
             {
                 labelStatus!!.setText(R.string.recording)
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
+                buttonRecordingDone!!.visibility = View.VISIBLE
             }
             KeyboardStatus.Waiting ->
             {
                 // TODO: Maybe animating it?
                 labelStatus!!.setText(R.string.transcribing)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
+                buttonRecordingDone!!.visibility = View.GONE
             }
         }
 
