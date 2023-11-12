@@ -42,15 +42,14 @@
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:background="#00FFFFFF"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
+        android:scaleType="fitCenter"
         android:contentDescription="@string/start_transcribing"
+        android:src="@drawable/recording_done"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/btn_mic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/btn_mic"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/recording_done"
-        tools:visibility="visible" />
+        app:layout_constraintVertical_bias="1.0"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
