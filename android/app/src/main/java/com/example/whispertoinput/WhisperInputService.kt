@@ -62,12 +62,40 @@ class WhisperInputService : InputMethodService()
         }
     }
 
-    private suspend fun whisperTranscription(): String {
-        // TODO: Make Whisper requests to transcribe
-        // For now a text is returned after some predetermined time.
-        delay(3000)
-        return "Text"
+    private fun transcribeAsync(callback: (String?) -> Unit) : Job {
+        suspend fun whisperTranscription(): String {
+            // TODO: Make Whisper requests to transcribe
+            // For now a text is returned after some predetermined time.
+            delay(3000)
+            return "Text"
+        }
+
+        // Create a cancellable job in the main thread (for UI updating)
+        val job = CoroutineScope(Dispatchers.Main).launch {
+
+            // Within the job, make a suspend call at the I/O thread
+            // It suspends before result is obtained.
+            val result = withContext(Dispatchers.IO) {
+                try {
+                    // Perform transcription here
+                    return@withContext whisperTranscription()
+                } catch (e: CancellationException) {
+                    // Task was canceled
+                    return@withContext null
+                }
+            }
+
+            // This callback is within the main thread.
+            if (!result.isNullOrEmpty())
+            {
+                callback.invoke(result)
+            }
+        }
+
+        return job
     }
+
+
 
     private fun setKeyboardStatus(newStatus : KeyboardStatus)
     {
