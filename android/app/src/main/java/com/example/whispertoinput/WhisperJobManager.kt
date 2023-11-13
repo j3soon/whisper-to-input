@@ -4,6 +4,8 @@ import kotlinx.coroutines.*
 
 class WhisperJobManager
 {
+    private var currentTranscriptionJob : Job? = null
+
     fun startTranscriptionJobAsync(callback: (String?) -> Unit)
     {
         // TODO: Start a transcription job
@@ -16,6 +18,11 @@ class WhisperJobManager
 
     private fun registerTranscriptionJob(job : Job?)
     {
-        // TODO: register a transcription job
+        if (currentTranscriptionJob != null)
+        {
+            currentTranscriptionJob!!.cancel()
+        }
+
+        currentTranscriptionJob = job
     }
 }
