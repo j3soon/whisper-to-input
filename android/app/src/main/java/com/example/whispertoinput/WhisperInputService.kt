@@ -18,11 +18,11 @@ class WhisperInputService : InputMethodService()
         }
 
         currentInputConnection?.commitText(text, text.length)
-        whisperKeyboard.Reset()
+        whisperKeyboard.reset()
     }
 
     override fun onCreateInputView(): View {
-        return whisperKeyboard.Setup(
+        return whisperKeyboard.setup(
             layoutInflater,
             { },
             { },
@@ -33,13 +33,13 @@ class WhisperInputService : InputMethodService()
     override fun onWindowShown() {
         super.onWindowShown()
         whisperJobManager.clearTranscriptionJob()
-        whisperKeyboard.Reset()
+        whisperKeyboard.reset()
     }
 
     override fun onWindowHidden() {
 
         super.onWindowHidden()
         whisperJobManager.clearTranscriptionJob()
-        whisperKeyboard.Reset()
+        whisperKeyboard.reset()
     }
 }

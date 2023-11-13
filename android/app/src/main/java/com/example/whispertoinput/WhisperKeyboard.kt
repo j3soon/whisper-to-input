@@ -33,7 +33,7 @@ class WhisperKeyboard
     private var labelStatus : TextView? = null
     private var waitingIcon : ProgressBar? = null
 
-    fun Setup(
+    fun setup(
         layoutInflater : LayoutInflater,
         onStartRecording : () -> Unit,
         onCancelRecording : () -> Unit,
@@ -58,13 +58,13 @@ class WhisperKeyboard
         this.onCancelTranscribing = onCancelTranscribing
 
         // Resets keyboard upon setup
-        Reset()
+        reset()
 
         // Returns the keyboard view (non-nullable)
         return keyboardView!!
     }
 
-    fun Reset()
+    fun reset()
     {
         setKeyboardStatus(KeyboardStatus.Idle)
     }
