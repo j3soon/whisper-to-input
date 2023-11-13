@@ -3,6 +3,7 @@ package com.example.whispertoinput
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.*
@@ -21,6 +22,7 @@ class WhisperInputService : InputMethodService()
     private var buttonMic : ImageButton? = null
     private var buttonRecordingDone : ImageButton? = null
     private var labelStatus : TextView? = null
+    private var waitingIcon : ProgressBar? = null
     private var keyboardStatus : KeyboardStatus = KeyboardStatus.Idle
     private var currentTranscriptionJob : Job? = null
 
@@ -29,6 +31,7 @@ class WhisperInputService : InputMethodService()
         buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton?
         buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
+        waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
 
         // Assign onClicks
         buttonMic!!.setOnClickListener{ onButtonMicClick(it) }
@@ -132,20 +135,22 @@ class WhisperInputService : InputMethodService()
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 buttonRecordingDone!!.visibility = View.GONE
+                waitingIcon!!.visibility = View.INVISIBLE
                 registerTranscriptionJob(null)
             }
             KeyboardStatus.Recording ->
             {
                 labelStatus!!.setText(R.string.recording)
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
+                waitingIcon!!.visibility = View.INVISIBLE
                 buttonRecordingDone!!.visibility = View.VISIBLE
                 registerTranscriptionJob(null)
             }
             KeyboardStatus.Waiting ->
             {
-                // TODO: Maybe animating it?
                 labelStatus!!.setText(R.string.transcribing)
-                buttonMic!!.setImageResource(R.drawable.mic_idle)
+                buttonMic!!.setImageResource(R.drawable.mic_transcribing)
+                waitingIcon!!.visibility = View.VISIBLE
                 buttonRecordingDone!!.visibility = View.GONE
             }
         }

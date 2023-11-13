@@ -42,13 +42,14 @@
             android:src="@drawable/mic_idle" />
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/pb_waiting_icon"
             style="?android:attr/progressBarStyle"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_margin="10dp"
             android:clickable="false"
-            android:focusable="false"/>
+            android:focusable="false"
+            android:visibility="invisible"/>
 
 
     </FrameLayout>
