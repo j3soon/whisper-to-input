@@ -1,6 +1,8 @@
 package com.example.whispertoinput
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.View.inflate
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -32,14 +34,22 @@ class WhisperKeyboard
     private var waitingIcon : ProgressBar? = null
 
     fun Setup(
+        layoutInflaer : LayoutInflater,
         onStartRecording : () -> Unit,
         onCancelRecording : () -> Unit,
         onStartTranscribing : () -> Unit,
         onCancelTranscribing: () -> Unit) : View
     {
-        // TODO: Inflate the keyboard layout & assign views
+        // Inflate the keyboard layout & assign views
+        keyboardView = layoutInflaer.inflate(R.layout.keyboard_view, null) as ConstraintLayout
+        buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton?
+        buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
+        labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
+        waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
 
-        // TODO: Set onClick listeners
+        // Set onClick listeners
+        buttonMic!!.setOnClickListener{ onButtonMicClick() }
+        buttonRecordingDone!!.setOnClickListener{ onButtonRecordingDoneClick() }
 
         // Set event listeners
         this.onStartRecording = onStartRecording
@@ -57,5 +67,20 @@ class WhisperKeyboard
     fun Reset()
     {
         // TODO: Reset Keyboard
+    }
+
+    private fun onButtonMicClick()
+    {
+        // TODO: Implementation
+    }
+
+    private fun onButtonRecordingDoneClick()
+    {
+        // TODO: Implementation
+    }
+
+    private fun setKeyboardStatus(newStatus : KeyboardStatus)
+    {
+        // TODO: Implementation
     }
 }
