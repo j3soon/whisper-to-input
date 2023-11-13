@@ -18,23 +18,40 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:text="@string/whisper_to_input"
-        app:layout_constraintBottom_toTopOf="@+id/btn_mic"
+        app:layout_constraintBottom_toTopOf="@+id/btn_mic_frame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btn_mic"
+    <FrameLayout
+        android:id="@+id/btn_mic_frame"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="#00FFFFFF"
-        android:scaleType="fitCenter"
-        android:src="@drawable/mic_idle"
-        android:contentDescription="@string/start_speech_to_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/label_status">
+
+        <ImageButton
+            android:id="@+id/btn_mic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/start_speech_to_text"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mic_idle" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="10dp"
+            android:clickable="false"
+            android:focusable="false"/>
+
+
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/btn_recording_done"
@@ -46,10 +63,10 @@
         android:contentDescription="@string/start_transcribing"
         android:src="@drawable/recording_done"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_mic"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/btn_mic"
+        app:layout_constraintStart_toEndOf="@+id/btn_mic_frame"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
