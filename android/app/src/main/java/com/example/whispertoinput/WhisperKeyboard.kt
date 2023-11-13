@@ -66,7 +66,7 @@ class WhisperKeyboard
 
     fun Reset()
     {
-        // TODO: Reset Keyboard
+        setKeyboardStatus(KeyboardStatus.Idle)
     }
 
     private fun onButtonMicClick()
@@ -81,6 +81,36 @@ class WhisperKeyboard
 
     private fun setKeyboardStatus(newStatus : KeyboardStatus)
     {
-        // TODO: Implementation
+        if (keyboardStatus == newStatus)
+        {
+            return
+        }
+
+        when (newStatus)
+        {
+            KeyboardStatus.Idle ->
+            {
+                labelStatus!!.setText(R.string.whisper_to_input)
+                buttonMic!!.setImageResource(R.drawable.mic_idle)
+                buttonRecordingDone!!.visibility = View.GONE
+                waitingIcon!!.visibility = View.INVISIBLE
+            }
+            KeyboardStatus.Recording ->
+            {
+                labelStatus!!.setText(R.string.recording)
+                buttonMic!!.setImageResource(R.drawable.mic_pressed)
+                waitingIcon!!.visibility = View.INVISIBLE
+                buttonRecordingDone!!.visibility = View.VISIBLE
+            }
+            KeyboardStatus.Waiting ->
+            {
+                labelStatus!!.setText(R.string.transcribing)
+                buttonMic!!.setImageResource(R.drawable.mic_transcribing)
+                waitingIcon!!.visibility = View.VISIBLE
+                buttonRecordingDone!!.visibility = View.GONE
+            }
+        }
+
+        keyboardStatus = newStatus
     }
 }
