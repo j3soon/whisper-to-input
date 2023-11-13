@@ -71,7 +71,28 @@ class WhisperKeyboard
 
     private fun onButtonMicClick()
     {
-        // TODO: Implementation
+        // Upon button mic click...
+        // Idle -> Start Recording
+        // Recording -> Cancel Recording
+        // Waiting -> Cancel Transcribing
+        when (keyboardStatus)
+        {
+            KeyboardStatus.Idle ->
+            {
+                setKeyboardStatus(KeyboardStatus.Recording)
+                onStartRecording()
+            }
+            KeyboardStatus.Recording ->
+            {
+                setKeyboardStatus(KeyboardStatus.Idle)
+                onCancelRecording()
+            }
+            KeyboardStatus.Waiting ->
+            {
+                setKeyboardStatus(KeyboardStatus.Idle)
+                onCancelTranscribing()
+            }
+        }
     }
 
     private fun onButtonRecordingDoneClick()
