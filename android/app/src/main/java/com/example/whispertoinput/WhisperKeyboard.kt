@@ -34,14 +34,14 @@ class WhisperKeyboard
     private var waitingIcon : ProgressBar? = null
 
     fun Setup(
-        layoutInflaer : LayoutInflater,
+        layoutInflater : LayoutInflater,
         onStartRecording : () -> Unit,
         onCancelRecording : () -> Unit,
         onStartTranscribing : () -> Unit,
         onCancelTranscribing: () -> Unit) : View
     {
         // Inflate the keyboard layout & assign views
-        keyboardView = layoutInflaer.inflate(R.layout.keyboard_view, null) as ConstraintLayout
+        keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
         buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton?
         buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
