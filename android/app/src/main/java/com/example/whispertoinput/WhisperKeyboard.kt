@@ -97,7 +97,14 @@ class WhisperKeyboard
 
     private fun onButtonRecordingDoneClick()
     {
-        // TODO: Implementation
+        // Upon button recording done click.
+        // Recording -> Start transcribing
+        // else -> nothing
+        if (keyboardStatus == KeyboardStatus.Recording)
+        {
+            setKeyboardStatus(KeyboardStatus.Waiting)
+            onStartTranscribing()
+        }
     }
 
     private fun setKeyboardStatus(newStatus : KeyboardStatus)
