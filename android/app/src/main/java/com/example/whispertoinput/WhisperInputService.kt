@@ -26,9 +26,9 @@ class WhisperInputService : InputMethodService()
 
     private fun setupKeyboardView()
     {
-        buttonMic = keyboardView!!.getViewById(R.id.btn_mic) as ImageButton
-        buttonRecordingDone = keyboardView!!.getViewById(R.id.btn_recording_done) as ImageButton
-        labelStatus = keyboardView!!.getViewById(R.id.label_status) as TextView
+        buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton?
+        buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
+        labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
 
         // Assign onClicks
         buttonMic!!.setOnClickListener{ onButtonMicClick(it) }
