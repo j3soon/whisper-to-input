@@ -13,7 +13,7 @@ class WhisperJobManager
 
     fun clearTranscriptionJob()
     {
-        // TODO: clear current transcription job
+        registerTranscriptionJob(null)
     }
 
     private fun registerTranscriptionJob(job : Job?)
