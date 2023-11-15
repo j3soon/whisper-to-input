@@ -46,7 +46,16 @@ class WhisperInputService : InputMethodService()
 
     private fun onStartRecording()
     {
+        // Upon starting recording, check whether audio permission is granted.
+        if (!isPermissionGranted())
+        {
+            // If not, launch app MainActivity (for permission setup).
+            launchMainActivity()
+            whisperKeyboard.reset()
+            return
+        }
 
+        startRecording()
     }
 
     private fun onCancelRecording()
