@@ -24,10 +24,30 @@ class WhisperInputService : InputMethodService()
     override fun onCreateInputView(): View {
         return whisperKeyboard.setup(
             layoutInflater,
-            { },
-            { },
-            { whisperJobManager.startTranscriptionJobAsync { transcriptionCallback(it) } },
-            { whisperJobManager.clearTranscriptionJob() })
+            { onStartRecording() },
+            { onCancelRecording() },
+            { onStartTranscription() },
+            { onCancelTranscription() })
+    }
+
+    private fun onStartRecording()
+    {
+
+    }
+
+    private fun onCancelRecording()
+    {
+
+    }
+
+    private fun onStartTranscription
+    {
+        whisperJobManager.startTranscriptionJobAsync { transcriptionCallback(it) }
+    }
+
+    private fun onCancelTranscription()
+    {
+        whisperJobManager.clearTranscriptionJob()
     }
 
     override fun onWindowShown() {
