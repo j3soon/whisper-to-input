@@ -1,6 +1,12 @@
 package com.example.whispertoinput
 
+import com.aallam.openai.api.audio.TranscriptionRequest
+import com.aallam.openai.api.file.FileSource
+import com.aallam.openai.api.model.ModelId
+import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.*
+import okio.FileSystem
+import okio.Path.Companion.toPath
 
 class WhisperJobManager
 {
@@ -9,10 +15,16 @@ class WhisperJobManager
     fun startTranscriptionJobAsync(filename: String, callback: (String?) -> Unit)
     {
         suspend fun whisperTranscription(): String {
-            // TODO: Make Whisper requests to transcribe
-            // For now a text is returned after some predetermined time.
-            delay(3000)
-            return "Text 文字文字"
+            val openai = OpenAI(
+                token = "<API-KEY>"
+            )
+            val request = TranscriptionRequest(
+                audio = FileSource(name = filename, source = FileSystem.SYSTEM.source(filename.toPath())),
+                model = ModelId("whisper-1"),
+            )
+            val transcription = openai.transcription(request)
+
+            return transcription.text
         }
 
         // Create a cancellable job in the main thread (for UI updating)
