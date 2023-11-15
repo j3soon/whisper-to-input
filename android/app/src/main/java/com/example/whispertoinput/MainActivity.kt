@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 
@@ -14,8 +15,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityCompat.requestPermissions(this, permissions, MICROPHONE_PERMISSION_REQUEST_CODE)
+        checkPermissions()
         setContentView(R.layout.activity_main)
+    }
+
+    // Checks whether permissions are granted. If not, automatically make a request.
+    private fun checkPermissions()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED)
+        {
+            // Shows a popup for permission request.
+            // If the permission has been previously (hard-)denied, the popup will not show.
+            // onRequestPermissionsResult will be called in either case.
+            ActivityCompat.requestPermissions(this, permissions, MICROPHONE_PERMISSION_REQUEST_CODE)
+        }
     }
 
     // Handles the results of permission requests.
