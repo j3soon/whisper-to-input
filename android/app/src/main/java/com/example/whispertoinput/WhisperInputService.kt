@@ -5,8 +5,11 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import java.io.IOException
+import android.Manifest
+import android.content.pm.PackageManager
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.3gp"
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
@@ -83,6 +86,13 @@ class WhisperInputService : InputMethodService()
 
             start()
         }
+    }
+
+    // Returns whether the permission RECORD_AUDIO is granted.
+    private fun isPermissionGranted() : Boolean
+    {
+        val microphonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+        return (microphonePermission == PackageManager.PERMISSION_GRANTED)
     }
 
     // Stops the recorder (the resulting file is there to stay).
