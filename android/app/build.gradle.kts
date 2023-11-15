@@ -36,7 +36,8 @@ android {
 }
 
 dependencies {
-
+    implementation("com.aallam.openai:openai-client:3.5.1")
+    implementation("io.ktor:ktor-client-okhttp:2.3.6")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
