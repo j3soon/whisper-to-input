@@ -26,6 +26,8 @@ class WhisperInputService : InputMethodService()
     }
 
     override fun onCreateInputView(): View {
+        // Assigns the file name for recorded audio
+        fileName = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
         return whisperKeyboard.setup(
             layoutInflater,
             { onStartRecording() },
