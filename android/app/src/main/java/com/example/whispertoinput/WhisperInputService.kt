@@ -60,7 +60,7 @@ class WhisperInputService : InputMethodService()
 
     private fun onCancelRecording()
     {
-
+        stopRecording()
     }
 
     private fun onStartTranscription()
@@ -127,6 +127,7 @@ class WhisperInputService : InputMethodService()
         super.onWindowShown()
         whisperJobManager.clearTranscriptionJob()
         whisperKeyboard.reset()
+        stopRecording()
     }
 
     override fun onWindowHidden() {
@@ -134,5 +135,6 @@ class WhisperInputService : InputMethodService()
         super.onWindowHidden()
         whisperJobManager.clearTranscriptionJob()
         whisperKeyboard.reset()
+        stopRecording()
     }
 }
