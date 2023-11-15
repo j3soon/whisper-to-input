@@ -6,7 +6,7 @@ class WhisperJobManager
 {
     private var currentTranscriptionJob : Job? = null
 
-    fun startTranscriptionJobAsync(callback: (String?) -> Unit)
+    fun startTranscriptionJobAsync(filename: String, callback: (String?) -> Unit)
     {
         suspend fun whisperTranscription(): String {
             // TODO: Make Whisper requests to transcribe

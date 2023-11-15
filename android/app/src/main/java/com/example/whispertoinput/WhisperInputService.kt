@@ -12,7 +12,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 
-private const val RECORDED_AUDIO_FILENAME = "recorded.3gp"
+private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 
 class WhisperInputService : InputMethodService()
@@ -20,7 +20,7 @@ class WhisperInputService : InputMethodService()
     private var whisperKeyboard : WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager : WhisperJobManager = WhisperJobManager()
     private var mediaRecorder : MediaRecorder? = null
-    private var fileName : String = ""
+    private var filename : String = ""
 
     private fun transcriptionCallback(text : String?)
     {
@@ -35,7 +35,7 @@ class WhisperInputService : InputMethodService()
 
     override fun onCreateInputView(): View {
         // Assigns the file name for recorded audio
-        fileName = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
+        filename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
         return whisperKeyboard.setup(
             layoutInflater,
             { onStartRecording() },
@@ -65,7 +65,8 @@ class WhisperInputService : InputMethodService()
 
     private fun onStartTranscription()
     {
-        whisperJobManager.startTranscriptionJobAsync { transcriptionCallback(it) }
+        stopRecording()
+        whisperJobManager.startTranscriptionJobAsync(filename) { transcriptionCallback(it) }
     }
 
     private fun onCancelTranscription()
@@ -84,8 +85,8 @@ class WhisperInputService : InputMethodService()
 
         mediaRecorder!!.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile(fileName)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setOutputFile(filename)
             setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
             try {
