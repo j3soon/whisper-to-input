@@ -1,14 +1,18 @@
 package com.example.whispertoinput
 
 import android.inputmethodservice.InputMethodService
+import android.media.MediaRecorder
 import android.view.View
 import kotlinx.coroutines.*
 
+private const val RECORDED_AUDIO_FILENAME = "recorded.3gp"
 
 class WhisperInputService : InputMethodService()
 {
     private var whisperKeyboard : WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager : WhisperJobManager = WhisperJobManager()
+    private var mediaRecorder : MediaRecorder? = null
+    private var fileName : String = ""
 
     private fun transcriptionCallback(text : String?)
     {
