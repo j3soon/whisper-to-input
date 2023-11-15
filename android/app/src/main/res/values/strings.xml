@@ -6,4 +6,5 @@
     <string name="transcribing">Transcribing…</string>
     <string name="start_speech_to_text">Start speech-to-text.</string>
     <string name="start_transcribing">Start transcribing.</string>
+    <string name="grant_microphone_permission">Grant Microphone Permission</string>
 </resources>
