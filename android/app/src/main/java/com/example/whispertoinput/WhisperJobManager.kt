@@ -21,6 +21,7 @@ class WhisperJobManager
             val request = TranscriptionRequest(
                 audio = FileSource(name = filename, source = FileSystem.SYSTEM.source(filename.toPath())),
                 model = ModelId("whisper-1"),
+                language = "zh"
             )
             val transcription = openai.transcription(request)
 
