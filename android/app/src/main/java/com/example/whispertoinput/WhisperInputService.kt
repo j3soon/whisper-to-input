@@ -40,7 +40,7 @@ class WhisperInputService : InputMethodService()
 
     }
 
-    private fun onStartTranscription
+    private fun onStartTranscription()
     {
         whisperJobManager.startTranscriptionJobAsync { transcriptionCallback(it) }
     }
