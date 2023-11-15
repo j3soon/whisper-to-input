@@ -2,10 +2,14 @@ package com.example.whispertoinput
 
 import android.inputmethodservice.InputMethodService
 import android.media.MediaRecorder
+import android.os.Build
+import android.util.Log
 import android.view.View
 import kotlinx.coroutines.*
+import java.io.IOException
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.3gp"
+private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 
 class WhisperInputService : InputMethodService()
 {
@@ -54,6 +58,41 @@ class WhisperInputService : InputMethodService()
     private fun onCancelTranscription()
     {
         whisperJobManager.clearTranscriptionJob()
+    }
+
+    // Starts the recorder (assumes granted permission or throws an exception)
+    private fun startRecording()
+    {
+        mediaRecorder = if (Build.VERSION.SDK_INT >= MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL) {
+            MediaRecorder(this)
+        } else {
+            MediaRecorder()
+        }
+
+        mediaRecorder!!.apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(fileName)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            try {
+                prepare()
+            } catch (e: IOException) {
+                Log.e("whisper-input", "prepare() failed")
+            }
+
+            start()
+        }
+    }
+
+    // Stops the recorder (the resulting file is there to stay).
+    private fun stopRecording()
+    {
+        mediaRecorder?.apply {
+            stop()
+            release()
+        }
+        mediaRecorder = null
     }
 
     override fun onWindowShown() {
