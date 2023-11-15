@@ -4,7 +4,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.*
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 
@@ -17,6 +21,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions()
         setContentView(R.layout.activity_main)
+    }
+
+    // The onClick event of the grant permission button.
+    // Opens up the app settings panel to manually configure permissions.
+    fun onRequestMicrophonePermission(view : View)
+    {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        with (intent) {
+            data = Uri.fromParts("package", packageName, null)
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+            addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+        }
+
+        startActivity(intent)
     }
 
     // Checks whether permissions are granted. If not, automatically make a request.
