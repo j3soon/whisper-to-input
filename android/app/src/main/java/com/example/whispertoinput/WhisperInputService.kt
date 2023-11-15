@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import java.io.IOException
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.3gp"
@@ -86,6 +87,14 @@ class WhisperInputService : InputMethodService()
 
             start()
         }
+    }
+
+    // Opens up app MainActivity
+    private fun launchMainActivity()
+    {
+        val dialogIntent = Intent(this, MainActivity::class.java)
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(dialogIntent)
     }
 
     // Returns whether the permission RECORD_AUDIO is granted.
