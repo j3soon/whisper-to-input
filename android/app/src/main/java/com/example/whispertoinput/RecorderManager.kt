@@ -2,9 +2,11 @@ package com.example.whispertoinput
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import java.io.IOException
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
@@ -60,4 +62,18 @@ class RecorderManager {
         recorder = null
     }
 
+    // Returns whether all of the permissions are granted.
+    private fun isAllPermissionsGranted(context: Context): Boolean {
+        for (permission in requiredPermissions()) {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
+            }
+        }
+
+        return true
+    }
 }
