@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/label_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -19,42 +19,42 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_mic_permission"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:onClick="onRequestMicrophonePermission"
         android:text="@string/grant_microphone_permission"
-        app:layout_constraintEnd_toEndOf="@+id/button2"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextMultiLine" />
+        app:layout_constraintEnd_toEndOf="@+id/btn_set_api_key"
+        app:layout_constraintStart_toEndOf="@+id/label_microphone"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_api_key" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/label_api_key"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:gravity="center_vertical"
         android:text="@string/api_key"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTextMultiLine"
-        app:layout_constraintEnd_toStartOf="@+id/editTextTextMultiLine"
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
+        app:layout_constraintEnd_toStartOf="@+id/edittext_api_key"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editTextTextMultiLine" />
+        app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/label_microphone"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center_vertical"
         android:text="@string/microphone"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/button"
-        app:layout_constraintEnd_toStartOf="@+id/button"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toTopOf="@+id/button" />
+        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_permission"
+        app:layout_constraintEnd_toStartOf="@+id/btn_mic_permission"
+        app:layout_constraintStart_toStartOf="@+id/label_api_key"
+        app:layout_constraintTop_toTopOf="@+id/btn_mic_permission" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/edittext_api_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -64,18 +64,18 @@
         android:hint="@string/enter_openai_api_key"
         android:inputType="textMultiLine"
         android:minHeight="48dp"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintEnd_toStartOf="@+id/btn_set_api_key"
+        app:layout_constraintStart_toEndOf="@+id/label_api_key"
+        app:layout_constraintTop_toBottomOf="@+id/label_title" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btn_set_api_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/set"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTextMultiLine"
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editTextTextMultiLine"
-        app:layout_constraintTop_toTopOf="@+id/editTextTextMultiLine" />
+        app:layout_constraintStart_toEndOf="@+id/edittext_api_key"
+        app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
