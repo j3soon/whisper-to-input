@@ -5,15 +5,12 @@ import android.view.View
 import kotlinx.coroutines.*
 
 
-class WhisperInputService : InputMethodService()
-{
-    private var whisperKeyboard : WhisperKeyboard = WhisperKeyboard()
-    private var whisperJobManager : WhisperJobManager = WhisperJobManager()
+class WhisperInputService : InputMethodService() {
+    private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
+    private var whisperJobManager: WhisperJobManager = WhisperJobManager()
 
-    private fun transcriptionCallback(text : String?)
-    {
-        if (text == null)
-        {
+    private fun transcriptionCallback(text: String?) {
+        if (text == null) {
             return
         }
 

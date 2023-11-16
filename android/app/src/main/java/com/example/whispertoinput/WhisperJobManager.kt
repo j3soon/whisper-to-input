@@ -2,12 +2,10 @@ package com.example.whispertoinput
 
 import kotlinx.coroutines.*
 
-class WhisperJobManager
-{
-    private var currentTranscriptionJob : Job? = null
+class WhisperJobManager {
+    private var currentTranscriptionJob: Job? = null
 
-    fun startTranscriptionJobAsync(callback: (String?) -> Unit)
-    {
+    fun startTranscriptionJobAsync(callback: (String?) -> Unit) {
         suspend fun whisperTranscription(): String {
             // TODO: Make Whisper requests to transcribe
             // For now a text is returned after some predetermined time.
@@ -31,8 +29,7 @@ class WhisperJobManager
             }
 
             // This callback is within the main thread.
-            if (!result.isNullOrEmpty())
-            {
+            if (!result.isNullOrEmpty()) {
                 callback.invoke(result)
             }
         }
@@ -40,13 +37,11 @@ class WhisperJobManager
         registerTranscriptionJob(job)
     }
 
-    fun clearTranscriptionJob()
-    {
+    fun clearTranscriptionJob() {
         registerTranscriptionJob(null)
     }
 
-    private fun registerTranscriptionJob(job : Job?)
-    {
+    private fun registerTranscriptionJob(job: Job?) {
         currentTranscriptionJob?.cancel()
         currentTranscriptionJob = job
     }
