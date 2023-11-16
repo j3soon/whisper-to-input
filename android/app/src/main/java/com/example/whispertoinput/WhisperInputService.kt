@@ -13,12 +13,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
-private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperJobManager = WhisperJobManager()
     private var recorderManager: RecorderManager = RecorderManager()
+    private var recordedAudioFilename: String = ""
 
     private fun transcriptionCallback(text: String?) {
         if (text == null) {
@@ -31,8 +31,7 @@ class WhisperInputService : InputMethodService() {
 
     override fun onCreateInputView(): View {
         // Assigns the file name for recorded audio
-        val recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
-        recorderManager.setup(recordedAudioFilename)
+        recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
 
         // Returns the keyboard after setting it up and inflating its layout
         return whisperKeyboard.setup(
@@ -45,14 +44,14 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartRecording() {
         // Upon starting recording, check whether audio permission is granted.
-        if (!isPermissionGranted()) {
+        if (!recorderManager.allPermissionsGranted(this)) {
             // If not, launch app MainActivity (for permission setup).
             launchMainActivity()
             whisperKeyboard.reset()
             return
         }
 
-        recorderManager.start(this)
+        recorderManager.start(this, recordedAudioFilename)
     }
 
     private fun onCancelRecording() {
@@ -61,7 +60,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartTranscription() {
         recorderManager.stop()
-        whisperJobManager.startTranscriptionJobAsync(recorderManager.getFilename()) { transcriptionCallback(it) }
+        whisperJobManager.startTranscriptionJobAsync(recordedAudioFilename) { transcriptionCallback(it) }
     }
 
     private fun onCancelTranscription() {
@@ -73,13 +72,6 @@ class WhisperInputService : InputMethodService() {
         val dialogIntent = Intent(this, MainActivity::class.java)
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(dialogIntent)
-    }
-
-    // Returns whether the permission RECORD_AUDIO is granted.
-    private fun isPermissionGranted(): Boolean {
-        val microphonePermission =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-        return (microphonePermission == PackageManager.PERMISSION_GRANTED)
     }
 
     override fun onWindowShown() {

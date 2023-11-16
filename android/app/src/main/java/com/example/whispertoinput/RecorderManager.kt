@@ -8,24 +8,17 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import java.io.IOException
+import java.io.File
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
-
 class RecorderManager {
     companion object {
         fun requiredPermissions() = arrayOf(Manifest.permission.RECORD_AUDIO)
     }
 
     private var recorder: MediaRecorder? = null
-    private var filename: String = ""
 
-    fun setup(filename: String) {
-        this.filename = filename
-    }
-
-    fun getFilename() = filename
-
-    fun start(context: Context) {
+    fun start(context: Context, filename: String) {
         recorder?.apply {
             stop()
             release()
@@ -63,7 +56,7 @@ class RecorderManager {
     }
 
     // Returns whether all of the permissions are granted.
-    private fun isAllPermissionsGranted(context: Context): Boolean {
+    fun allPermissionsGranted(context: Context): Boolean {
         for (permission in requiredPermissions()) {
             if (ContextCompat.checkSelfPermission(
                     context,
