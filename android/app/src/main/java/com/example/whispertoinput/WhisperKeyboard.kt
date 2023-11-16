@@ -120,8 +120,8 @@ class WhisperKeyboard
             {
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
-                buttonRecordingDone!!.visibility = View.GONE
                 waitingIcon!!.visibility = View.INVISIBLE
+                buttonRecordingDone!!.visibility = View.GONE
             }
             KeyboardStatus.Recording ->
             {
