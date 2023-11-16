@@ -1,10 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:keyPreviewLayout="@layout/key_preview"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/keyboard_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
-    android:background="@color/light_purple">
+    android:layout_gravity="bottom"
+    android:background="@color/light_purple"
+    android:clipToPadding="false"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
-</android.inputmethodservice.KeyboardView>
+    <TextView
+        android:id="@+id/label_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/whisper_to_input"
+        app:layout_constraintBottom_toTopOf="@+id/btn_mic_frame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/btn_mic_frame"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_status">
+
+        <ImageButton
+            android:id="@+id/btn_mic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/start_speech_to_text"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mic_idle" />
+
+        <ProgressBar
+            android:id="@+id/pb_waiting_icon"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="10dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:visibility="invisible"/>
+
+
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/btn_recording_done"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:background="#00FFFFFF"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/start_transcribing"
+        android:src="@drawable/recording_done"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/btn_mic_frame"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
