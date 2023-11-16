@@ -15,17 +15,14 @@ import android.content.pm.PackageManager
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 
-class WhisperInputService : InputMethodService()
-{
-    private var whisperKeyboard : WhisperKeyboard = WhisperKeyboard()
-    private var whisperJobManager : WhisperJobManager = WhisperJobManager()
-    private var mediaRecorder : MediaRecorder? = null
-    private var filename : String = ""
+class WhisperInputService : InputMethodService() {
+    private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
+    private var whisperJobManager: WhisperJobManager = WhisperJobManager()
+    private var mediaRecorder: MediaRecorder? = null
+    private var filename: String = ""
 
-    private fun transcriptionCallback(text : String?)
-    {
-        if (text == null)
-        {
+    private fun transcriptionCallback(text: String?) {
+        if (text == null) {
             return
         }
 
@@ -44,11 +41,9 @@ class WhisperInputService : InputMethodService()
             { onCancelTranscription() })
     }
 
-    private fun onStartRecording()
-    {
+    private fun onStartRecording() {
         // Upon starting recording, check whether audio permission is granted.
-        if (!isPermissionGranted())
-        {
+        if (!isPermissionGranted()) {
             // If not, launch app MainActivity (for permission setup).
             launchMainActivity()
             whisperKeyboard.reset()
@@ -58,30 +53,27 @@ class WhisperInputService : InputMethodService()
         startRecording()
     }
 
-    private fun onCancelRecording()
-    {
+    private fun onCancelRecording() {
         stopRecording()
     }
 
-    private fun onStartTranscription()
-    {
+    private fun onStartTranscription() {
         stopRecording()
         whisperJobManager.startTranscriptionJobAsync(filename) { transcriptionCallback(it) }
     }
 
-    private fun onCancelTranscription()
-    {
+    private fun onCancelTranscription() {
         whisperJobManager.clearTranscriptionJob()
     }
 
     // Starts the recorder (assumes granted permission or throws an exception)
-    private fun startRecording()
-    {
-        mediaRecorder = if (Build.VERSION.SDK_INT >= MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL) {
-            MediaRecorder(this)
-        } else {
-            MediaRecorder()
-        }
+    private fun startRecording() {
+        mediaRecorder =
+            if (Build.VERSION.SDK_INT >= MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL) {
+                MediaRecorder(this)
+            } else {
+                MediaRecorder()
+            }
 
         mediaRecorder!!.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -100,23 +92,21 @@ class WhisperInputService : InputMethodService()
     }
 
     // Opens up app MainActivity
-    private fun launchMainActivity()
-    {
+    private fun launchMainActivity() {
         val dialogIntent = Intent(this, MainActivity::class.java)
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(dialogIntent)
     }
 
     // Returns whether the permission RECORD_AUDIO is granted.
-    private fun isPermissionGranted() : Boolean
-    {
-        val microphonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+    private fun isPermissionGranted(): Boolean {
+        val microphonePermission =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
         return (microphonePermission == PackageManager.PERMISSION_GRANTED)
     }
 
     // Stops the recorder (the resulting file is there to stay).
-    private fun stopRecording()
-    {
+    private fun stopRecording() {
         mediaRecorder?.apply {
             stop()
             release()

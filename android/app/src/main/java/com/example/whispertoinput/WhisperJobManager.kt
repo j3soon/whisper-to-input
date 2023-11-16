@@ -8,18 +8,19 @@ import kotlinx.coroutines.*
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
-class WhisperJobManager
-{
-    private var currentTranscriptionJob : Job? = null
+class WhisperJobManager {
+    private var currentTranscriptionJob: Job? = null
 
-    fun startTranscriptionJobAsync(filename: String, callback: (String?) -> Unit)
-    {
+    fun startTranscriptionJobAsync(filename: String, callback: (String?) -> Unit) {
         suspend fun whisperTranscription(): String {
             val openai = OpenAI(
                 token = "<API-KEY>"
             )
             val request = TranscriptionRequest(
-                audio = FileSource(name = filename, source = FileSystem.SYSTEM.source(filename.toPath())),
+                audio = FileSource(
+                    name = filename,
+                    source = FileSystem.SYSTEM.source(filename.toPath())
+                ),
                 model = ModelId("whisper-1"),
                 language = "zh"
             )
@@ -44,8 +45,7 @@ class WhisperJobManager
             }
 
             // This callback is within the main thread.
-            if (!result.isNullOrEmpty())
-            {
+            if (!result.isNullOrEmpty()) {
                 callback.invoke(result)
             }
         }
@@ -53,15 +53,12 @@ class WhisperJobManager
         registerTranscriptionJob(job)
     }
 
-    fun clearTranscriptionJob()
-    {
+    fun clearTranscriptionJob() {
         registerTranscriptionJob(null)
     }
 
-    private fun registerTranscriptionJob(job : Job?)
-    {
-        if (currentTranscriptionJob != null)
-        {
+    private fun registerTranscriptionJob(job: Job?) {
+        if (currentTranscriptionJob != null) {
             currentTranscriptionJob!!.cancel()
         }
 

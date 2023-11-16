@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 
 class MainActivity : AppCompatActivity() {
-    private val permissions : Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
+    private val permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,10 +25,9 @@ class MainActivity : AppCompatActivity() {
 
     // The onClick event of the grant permission button.
     // Opens up the app settings panel to manually configure permissions.
-    fun onRequestMicrophonePermission(view : View)
-    {
+    fun onRequestMicrophonePermission(view: View) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        with (intent) {
+        with(intent) {
             data = Uri.fromParts("package", packageName, null)
             addCategory(Intent.CATEGORY_DEFAULT)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -40,10 +39,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Checks whether permissions are granted. If not, automatically make a request.
-    private fun checkPermissions()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED)
-        {
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
             // Shows a popup for permission request.
             // If the permission has been previously (hard-)denied, the popup will not show.
             // onRequestPermissionsResult will be called in either case.
@@ -60,17 +61,18 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         // Only handles requests marked with the unique code.
-        if (requestCode != MICROPHONE_PERMISSION_REQUEST_CODE)
-        {
+        if (requestCode != MICROPHONE_PERMISSION_REQUEST_CODE) {
             return
         }
 
         // All permissions should be granted.
-        for (result in grantResults)
-        {
-            if (result != PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(this, getString(R.string.mic_permission_required), Toast.LENGTH_SHORT).show()
+        for (result in grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.mic_permission_required),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return
             }
         }
