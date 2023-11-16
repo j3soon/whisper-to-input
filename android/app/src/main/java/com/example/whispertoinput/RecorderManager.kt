@@ -21,6 +21,8 @@ class RecorderManager {
         this.filename = filename
     }
 
+    fun getFilename() = filename
+
     fun start(context: Context) {
         recorder?.apply {
             stop()

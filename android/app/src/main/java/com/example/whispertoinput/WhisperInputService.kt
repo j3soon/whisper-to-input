@@ -18,8 +18,7 @@ private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperJobManager = WhisperJobManager()
-    private var mediaRecorder: MediaRecorder? = null
-    private var filename: String = ""
+    private var recorderManager: RecorderManager = RecorderManager()
 
     private fun transcriptionCallback(text: String?) {
         if (text == null) {
@@ -32,7 +31,10 @@ class WhisperInputService : InputMethodService() {
 
     override fun onCreateInputView(): View {
         // Assigns the file name for recorded audio
-        filename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
+        val recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
+        recorderManager.setup(recordedAudioFilename)
+
+        // Returns the keyboard after setting it up and inflating its layout
         return whisperKeyboard.setup(
             layoutInflater,
             { onStartRecording() },
@@ -50,45 +52,20 @@ class WhisperInputService : InputMethodService() {
             return
         }
 
-        startRecording()
+        recorderManager.start(this)
     }
 
     private fun onCancelRecording() {
-        stopRecording()
+        recorderManager.stop()
     }
 
     private fun onStartTranscription() {
-        stopRecording()
-        whisperJobManager.startTranscriptionJobAsync(filename) { transcriptionCallback(it) }
+        recorderManager.stop()
+        whisperJobManager.startTranscriptionJobAsync(recorderManager.getFilename()) { transcriptionCallback(it) }
     }
 
     private fun onCancelTranscription() {
         whisperJobManager.clearTranscriptionJob()
-    }
-
-    // Starts the recorder (assumes granted permission or throws an exception)
-    private fun startRecording() {
-        mediaRecorder =
-            if (Build.VERSION.SDK_INT >= MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL) {
-                MediaRecorder(this)
-            } else {
-                MediaRecorder()
-            }
-
-        mediaRecorder!!.apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setOutputFile(filename)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-
-            try {
-                prepare()
-            } catch (e: IOException) {
-                Log.e("whisper-input", "prepare() failed")
-            }
-
-            start()
-        }
     }
 
     // Opens up app MainActivity
@@ -105,20 +82,11 @@ class WhisperInputService : InputMethodService() {
         return (microphonePermission == PackageManager.PERMISSION_GRANTED)
     }
 
-    // Stops the recorder (the resulting file is there to stay).
-    private fun stopRecording() {
-        mediaRecorder?.apply {
-            stop()
-            release()
-        }
-        mediaRecorder = null
-    }
-
     override fun onWindowShown() {
         super.onWindowShown()
         whisperJobManager.clearTranscriptionJob()
         whisperKeyboard.reset()
-        stopRecording()
+        recorderManager.stop()
     }
 
     override fun onWindowHidden() {
@@ -126,6 +94,6 @@ class WhisperInputService : InputMethodService() {
         super.onWindowHidden()
         whisperJobManager.clearTranscriptionJob()
         whisperKeyboard.reset()
-        stopRecording()
+        recorderManager.stop()
     }
 }
