@@ -11,6 +11,7 @@ import java.io.IOException
 import java.io.File
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
+
 class RecorderManager {
     companion object {
         fun requiredPermissions() = arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -60,7 +61,7 @@ class RecorderManager {
         for (permission in requiredPermissions()) {
             if (ContextCompat.checkSelfPermission(
                     context,
-                    Manifest.permission.RECORD_AUDIO
+                    permission
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return false
