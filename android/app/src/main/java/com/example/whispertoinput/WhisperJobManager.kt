@@ -1,20 +1,26 @@
 package com.example.whispertoinput
 
+import android.content.Context
 import com.aallam.openai.api.audio.TranscriptionRequest
 import com.aallam.openai.api.file.FileSource
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
 class WhisperJobManager {
     private var currentTranscriptionJob: Job? = null
 
-    fun startTranscriptionJobAsync(filename: String, callback: (String?) -> Unit) {
+    fun startTranscriptionJobAsync(context: Context, filename: String, callback: (String?) -> Unit) {
         suspend fun whisperTranscription(): String {
+            val apiKey = context.dataStore.data.map { preferences ->
+                preferences[API_KEY]
+            }.first()
             val openai = OpenAI(
-                token = "<API-KEY>"
+                token = apiKey ?: "",
             )
             val request = TranscriptionRequest(
                 audio = FileSource(

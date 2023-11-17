@@ -60,7 +60,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartTranscription() {
         recorderManager.stop()
-        whisperJobManager.startTranscriptionJobAsync(recordedAudioFilename) { transcriptionCallback(it) }
+        whisperJobManager.startTranscriptionJobAsync(this, recordedAudioFilename) { transcriptionCallback(it) }
     }
 
     private fun onCancelTranscription() {
