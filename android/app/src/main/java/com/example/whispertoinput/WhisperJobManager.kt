@@ -76,10 +76,7 @@ class WhisperJobManager {
     }
 
     private fun registerTranscriptionJob(job: Job?) {
-        if (currentTranscriptionJob != null) {
-            currentTranscriptionJob!!.cancel()
-        }
-
+        currentTranscriptionJob?.cancel()
         currentTranscriptionJob = job
     }
 }
