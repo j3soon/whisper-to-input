@@ -32,7 +32,7 @@ class RecorderManager {
             }
 
         recorder!!.apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setOutputFile(filename)
             setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
