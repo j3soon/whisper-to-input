@@ -1,6 +1,7 @@
 package com.example.whispertoinput
 
 import android.content.Context
+import android.util.Log
 import com.aallam.openai.api.audio.TranscriptionRequest
 import com.aallam.openai.api.file.FileSource
 import com.aallam.openai.api.model.ModelId
@@ -14,7 +15,11 @@ import okio.Path.Companion.toPath
 class WhisperJobManager {
     private var currentTranscriptionJob: Job? = null
 
-    fun startTranscriptionJobAsync(context: Context, filename: String, callback: (String?) -> Unit) {
+    fun startTranscriptionJobAsync(
+        context: Context,
+        filename: String,
+        callback: (String?) -> Unit
+    ) {
         suspend fun whisperTranscription(): String {
             val apiKey = context.dataStore.data.map { preferences ->
                 preferences[API_KEY]
@@ -47,13 +52,13 @@ class WhisperJobManager {
                 } catch (e: CancellationException) {
                     // Task was canceled
                     return@withContext null
+                } catch (e: Exception) {
+                    return@withContext null
                 }
             }
 
             // This callback is within the main thread.
-            if (!result.isNullOrEmpty()) {
-                callback.invoke(result)
-            }
+            callback.invoke(result)
         }
 
         registerTranscriptionJob(job)

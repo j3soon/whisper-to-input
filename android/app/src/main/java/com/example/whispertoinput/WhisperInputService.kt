@@ -21,11 +21,10 @@ class WhisperInputService : InputMethodService() {
     private var recordedAudioFilename: String = ""
 
     private fun transcriptionCallback(text: String?) {
-        if (text == null) {
-            return
+        if (!text.isNullOrEmpty()) {
+            currentInputConnection?.commitText(text, text.length)
         }
 
-        currentInputConnection?.commitText(text, text.length)
         whisperKeyboard.reset()
     }
 
@@ -60,7 +59,10 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartTranscription() {
         recorderManager.stop()
-        whisperJobManager.startTranscriptionJobAsync(this, recordedAudioFilename) { transcriptionCallback(it) }
+        whisperJobManager.startTranscriptionJobAsync(
+            this,
+            recordedAudioFilename
+        ) { transcriptionCallback(it) }
     }
 
     private fun onCancelTranscription() {
