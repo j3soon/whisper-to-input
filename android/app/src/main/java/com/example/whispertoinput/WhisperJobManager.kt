@@ -18,7 +18,8 @@ class WhisperJobManager {
     fun startTranscriptionJobAsync(
         context: Context,
         filename: String,
-        callback: (String?) -> Unit
+        callback: (String?) -> Unit,
+        exceptionCallback: (String) -> Unit
     ) {
         suspend fun whisperTranscription(): String {
             val apiKey = context.dataStore.data.map { preferences ->
@@ -45,20 +46,26 @@ class WhisperJobManager {
 
             // Within the job, make a suspend call at the I/O thread
             // It suspends before result is obtained.
-            val result = withContext(Dispatchers.IO) {
+            // Returns (transcribed string, exception message)
+            val (transcribedText, exceptionMessage) = withContext(Dispatchers.IO) {
                 try {
                     // Perform transcription here
-                    return@withContext whisperTranscription()
+                    return@withContext Pair(whisperTranscription(), null)
                 } catch (e: CancellationException) {
                     // Task was canceled
-                    return@withContext null
+                    return@withContext Pair(null, null)
                 } catch (e: Exception) {
-                    return@withContext null
+                    return@withContext Pair(null, e.message)
                 }
             }
 
             // This callback is within the main thread.
-            callback.invoke(result)
+            callback.invoke(transcribedText)
+
+            // If exception message is not null
+            if (!exceptionMessage.isNullOrEmpty()) {
+                exceptionCallback(exceptionMessage)
+            }
         }
 
         registerTranscriptionJob(job)

@@ -11,6 +11,7 @@ import java.io.IOException
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.widget.Toast
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 
@@ -26,6 +27,10 @@ class WhisperInputService : InputMethodService() {
         }
 
         whisperKeyboard.reset()
+    }
+
+    private fun transcriptionExceptionCallback(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateInputView(): View {
@@ -61,8 +66,10 @@ class WhisperInputService : InputMethodService() {
         recorderManager.stop()
         whisperJobManager.startTranscriptionJobAsync(
             this,
-            recordedAudioFilename
-        ) { transcriptionCallback(it) }
+            recordedAudioFilename,
+            { transcriptionCallback(it) },
+            { transcriptionExceptionCallback(it) }
+        )
     }
 
     private fun onCancelTranscription() {
