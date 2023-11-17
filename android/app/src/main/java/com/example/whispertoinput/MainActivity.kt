@@ -10,22 +10,32 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.*
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
-import androidx.datastore.*
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+val API_KEY = stringPreferencesKey("api-key")
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkPermissions()
         setContentView(R.layout.activity_main)
+        setupApiKeyWidgets()
+        checkPermissions()
     }
 
     // The onClick event of the grant permission button.
@@ -43,6 +53,49 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    // Sets up API Key-related widgets.
+    private fun setupApiKeyWidgets() {
+        // Launches a non-blocking job in the main thread.
+        // Perform data retrieval in the IO thread.
+        val apiKeyInput: EditText = findViewById(R.id.edittext_api_key)
+        val btnSetApiKey: Button = findViewById(R.id.btn_set_api_key)
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            // Disable input & button, and show loading hint
+            apiKeyInput.isEnabled = false
+            apiKeyInput.hint = getString(R.string.loading)
+            btnSetApiKey.isEnabled = false
+
+            // Retrieve Api Key
+            val retrievedApiKey = withContext(Dispatchers.IO) {
+                return@withContext dataStore.data.map { preferences ->
+                    preferences[API_KEY]
+                }.first()
+            }
+
+            // Set retrieved api key in input, or set "Enter API Key" hint
+            if (retrievedApiKey.isNullOrEmpty()) {
+                apiKeyInput.hint = getString(R.string.enter_openai_api_key)
+            } else {
+                apiKeyInput.setText(retrievedApiKey)
+            }
+
+            // Re-enable input & button
+            apiKeyInput.isEnabled = true
+            btnSetApiKey.isEnabled = true
+
+            // After retrieval is done, assign onClick event to the setApiKey button
+            btnSetApiKey.setOnClickListener { onSetApiKey() }
+        }
+    }
+
+    // The onClick event of the button set api key
+    private fun onSetApiKey()
+    {
+        // TODO: Implement writing to apiKey to dataStore
+    }
+
     // Checks whether permissions are granted. If not, automatically make a request.
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(
@@ -53,7 +106,11 @@ class MainActivity : AppCompatActivity() {
             // Shows a popup for permission request.
             // If the permission has been previously (hard-)denied, the popup will not show.
             // onRequestPermissionsResult will be called in either case.
-            ActivityCompat.requestPermissions(this, RecorderManager.requiredPermissions(), MICROPHONE_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(
+                this,
+                RecorderManager.requiredPermissions(),
+                MICROPHONE_PERMISSION_REQUEST_CODE
+            )
         }
     }
 
