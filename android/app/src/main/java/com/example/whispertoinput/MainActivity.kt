@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setupApiKeyWidgets()
+        setupApiKeyWidgets(this)
         checkPermissions()
     }
 
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Sets up API Key-related widgets.
-    private fun setupApiKeyWidgets() {
+    private fun setupApiKeyWidgets(context: Context) {
         // Launches a non-blocking job in the main thread.
         // Perform data retrieval in the IO thread.
         val apiKeyInput: EditText = findViewById(R.id.edittext_api_key)
@@ -86,14 +87,21 @@ class MainActivity : AppCompatActivity() {
             btnSetApiKey.isEnabled = true
 
             // After retrieval is done, assign onClick event to the setApiKey button
-            btnSetApiKey.setOnClickListener { onSetApiKey() }
+            btnSetApiKey.setOnClickListener { onSetApiKey(context, apiKeyInput.text.toString()) }
         }
     }
 
     // The onClick event of the button set api key
-    private fun onSetApiKey()
-    {
-        // TODO: Implement writing to apiKey to dataStore
+    private fun onSetApiKey(context: Context, newApiKey: String?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                dataStore.edit { settings ->
+                    settings[API_KEY] = newApiKey ?: ""
+                }
+            }
+
+            Toast.makeText(context, getString(R.string.api_key_successfully_set), Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Checks whether permissions are granted. If not, automatically make a request.
