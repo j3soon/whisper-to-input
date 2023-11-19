@@ -12,16 +12,16 @@ import kotlinx.coroutines.flow.map
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
-class WhisperJobManager {
+class WhisperTranscriber {
     private var currentTranscriptionJob: Job? = null
 
-    fun startTranscriptionJobAsync(
+    fun startAsync(
         context: Context,
         filename: String,
         callback: (String?) -> Unit,
         exceptionCallback: (String) -> Unit
     ) {
-        suspend fun whisperTranscription(): String {
+        suspend fun makeWhisperRequest(): String {
             val apiKey = context.dataStore.data.map { preferences ->
                 preferences[API_KEY]
             }.first()
@@ -50,7 +50,7 @@ class WhisperJobManager {
             val (transcribedText, exceptionMessage) = withContext(Dispatchers.IO) {
                 try {
                     // Perform transcription here
-                    return@withContext Pair(whisperTranscription(), null)
+                    return@withContext Pair(makeWhisperRequest(), null)
                 } catch (e: CancellationException) {
                     // Task was canceled
                     return@withContext Pair(null, null)
@@ -71,7 +71,7 @@ class WhisperJobManager {
         registerTranscriptionJob(job)
     }
 
-    fun clearTranscriptionJob() {
+    fun stop() {
         registerTranscriptionJob(null)
     }
 

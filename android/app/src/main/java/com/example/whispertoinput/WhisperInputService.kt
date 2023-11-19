@@ -17,7 +17,7 @@ private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
-    private var whisperJobManager: WhisperJobManager = WhisperJobManager()
+    private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager = RecorderManager()
     private var recordedAudioFilename: String = ""
 
@@ -64,7 +64,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartTranscription() {
         recorderManager.stop()
-        whisperJobManager.startTranscriptionJobAsync(
+        whisperJobManager.startAsync(
             this,
             recordedAudioFilename,
             { transcriptionCallback(it) },
@@ -73,7 +73,7 @@ class WhisperInputService : InputMethodService() {
     }
 
     private fun onCancelTranscription() {
-        whisperJobManager.clearTranscriptionJob()
+        whisperJobManager.stop()
     }
 
     // Opens up app MainActivity
@@ -85,7 +85,7 @@ class WhisperInputService : InputMethodService() {
 
     override fun onWindowShown() {
         super.onWindowShown()
-        whisperJobManager.clearTranscriptionJob()
+        whisperJobManager.stop()
         whisperKeyboard.reset()
         recorderManager.stop()
     }
@@ -93,7 +93,7 @@ class WhisperInputService : InputMethodService() {
     override fun onWindowHidden() {
 
         super.onWindowHidden()
-        whisperJobManager.clearTranscriptionJob()
+        whisperJobManager.stop()
         whisperKeyboard.reset()
         recorderManager.stop()
     }
