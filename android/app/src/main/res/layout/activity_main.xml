@@ -18,29 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_mic_permission"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:onClick="onRequestMicrophonePermission"
-        android:text="@string/grant_microphone_permission"
-        app:layout_constraintEnd_toEndOf="@+id/btn_set_api_key"
-        app:layout_constraintStart_toEndOf="@+id/label_microphone"
-        app:layout_constraintTop_toBottomOf="@+id/edittext_api_key" />
-
-    <TextView
-        android:id="@+id/label_api_key"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:gravity="center_vertical"
-        android:text="@string/api_key"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
-        app:layout_constraintEnd_toStartOf="@+id/edittext_api_key"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
-
     <TextView
         android:id="@+id/label_microphone"
         android:layout_width="0dp"
@@ -50,32 +27,95 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/btn_mic_permission"
         app:layout_constraintEnd_toStartOf="@+id/btn_mic_permission"
-        app:layout_constraintStart_toStartOf="@+id/label_api_key"
+        app:layout_constraintStart_toStartOf="@+id/label_endpoint"
         app:layout_constraintTop_toTopOf="@+id/btn_mic_permission" />
 
-    <EditText
-        android:id="@+id/edittext_api_key"
+    <Button
+        android:id="@+id/btn_mic_permission"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="onRequestMicrophonePermission"
+        android:text="@string/grant_microphone_permission"
+        app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
+        app:layout_constraintStart_toEndOf="@+id/label_microphone"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_language_code" />
+
+    <TextView
+        android:id="@+id/label_endpoint"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:gravity="center_vertical"
+        android:text="Endpoint"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_endpoint"
+        app:layout_constraintEnd_toStartOf="@+id/edittext_endpoint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edittext_endpoint" />
+
+    <EditText
+        android:id="@+id/edittext_endpoint"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp"
         android:ems="10"
         android:gravity="start|top"
-        android:hint="@string/enter_openai_api_key"
+        android:hint="example: http://<host>:<port>/asr"
         android:inputType="textMultiLine"
         android:minHeight="48dp"
-        app:layout_constraintEnd_toStartOf="@+id/btn_set_api_key"
-        app:layout_constraintStart_toEndOf="@+id/label_api_key"
+        app:layout_constraintEnd_toStartOf="@+id/btn_set_endpoint"
+        app:layout_constraintStart_toEndOf="@+id/label_endpoint"
         app:layout_constraintTop_toBottomOf="@+id/label_title" />
 
     <Button
-        android:id="@+id/btn_set_api_key"
+        android:id="@+id/btn_set_endpoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:text="@string/set"
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_endpoint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edittext_endpoint"
+        app:layout_constraintTop_toTopOf="@+id/edittext_endpoint" />
+
+    <TextView
+        android:id="@+id/label_language_code"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:text="Language Code"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_language_code"
+        app:layout_constraintEnd_toStartOf="@+id/edittext_language_code"
+        app:layout_constraintStart_toStartOf="@+id/label_endpoint"
+        app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
+
+    <EditText
+        android:id="@+id/edittext_language_code"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Enter Language Code (e.g., en, zh)"
+        android:inputType="textMultiLine"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_set_language_code"
+        app:layout_constraintStart_toEndOf="@+id/label_language_code"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_endpoint" />
+
+    <Button
+        android:id="@+id/btn_set_language_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/set"
-        app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/edittext_api_key"
-        app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
+        app:layout_constraintBottom_toBottomOf="@+id/edittext_language_code"
+        app:layout_constraintEnd_toEndOf="@id/btn_set_endpoint"
+        app:layout_constraintStart_toEndOf="@+id/edittext_language_code"
+        app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
