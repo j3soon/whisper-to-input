@@ -33,6 +33,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/microphone"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_mic_permission"
                 app:layout_constraintEnd_toStartOf="@+id/btn_mic_permission"
                 app:layout_constraintStart_toStartOf="@+id/label_endpoint"
@@ -45,6 +46,7 @@
                 android:layout_marginTop="24dp"
                 android:onClick="onRequestMicrophonePermission"
                 android:text="@string/grant_microphone_permission"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
                 app:layout_constraintTop_toBottomOf="@+id/edittext_language_code" />
 
@@ -90,12 +92,14 @@
 
             <TextView
                 android:id="@+id/label_language_code"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="center_vertical"
                 android:text="@string/language_code"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/edittext_language_code"
+                app:layout_constraintEnd_toStartOf="@+id/edittext_language_code"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/label_endpoint"
                 app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
 
@@ -124,6 +128,81 @@
                 app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
                 app:layout_constraintStart_toEndOf="@+id/edittext_language_code"
                 app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
+
+
+            <TextView
+                android:id="@+id/label_request_style"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:text="Request Style"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/radio_request_style"
+                app:layout_constraintEnd_toStartOf="@+id/radio_request_style"
+                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
+                app:layout_constraintTop_toTopOf="@+id/radio_request_style" />
+
+            <RadioGroup
+                android:id="@+id/radio_request_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@+id/btn_set_language_code"
+                app:layout_constraintTop_toBottomOf="@+id/edittext_language_code">
+
+                <RadioButton
+                    android:id="@+id/radio_btn_openai_api"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="OpenAI API" />
+
+                <RadioButton
+                    android:id="@+id/radio_btn_whisper_webservice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Whisper Webservice" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/label_api_key"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:text="API Key"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
+                app:layout_constraintEnd_toStartOf="@+id/edittext_api_key"
+                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
+                app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
+
+            <EditText
+                android:id="@+id/edittext_api_key"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Enter OpenAI API Key..."
+                android:inputType="textMultiLine"
+                android:minHeight="48dp"
+                app:layout_constraintEnd_toStartOf="@+id/btn_set_language_code"
+                app:layout_constraintStart_toEndOf="@+id/label_api_key"
+                app:layout_constraintTop_toBottomOf="@id/radio_request_style" />
+
+            <Button
+                android:id="@+id/btn_set_api_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/set"
+                app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
+                app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/edittext_api_key"
+                app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
