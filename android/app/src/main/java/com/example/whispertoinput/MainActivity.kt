@@ -12,10 +12,12 @@ import android.provider.*
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -30,6 +32,7 @@ private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
+val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
 val API_KEY = stringPreferencesKey("api-key")
 
 class MainActivity : AppCompatActivity() {
@@ -57,25 +60,31 @@ class MainActivity : AppCompatActivity() {
 
     // Sets up config widgets.
     private fun setupConfigWidgets(context: Context) {
-        // TODO: Refactor. Perhaps use a class to process configuration UI and behaviors.
+        // TODO: Refactor. Perhaps use a class to process configuration UI widgets and behaviors.
         // Launches a non-blocking job in the main thread.
         // Perform data retrieval in the IO thread.
         val endpointInput: EditText = findViewById(R.id.edittext_endpoint)
         val btnSetEndpoint: Button = findViewById(R.id.btn_set_endpoint)
         val languageCodeInput: EditText = findViewById(R.id.edittext_language_code)
         val btnSetLanguageCode: Button = findViewById(R.id.btn_set_language_code)
+        val apiKeyInput: EditText = findViewById(R.id.edittext_api_key)
+        val btnSetApiKey: Button = findViewById(R.id.btn_set_api_key)
+        val requestStyleOption : RadioGroup = findViewById(R.id.radio_request_style)
 
         CoroutineScope(Dispatchers.Main).launch {
 
-            // Disable input & button, and show loading hint
+            // Disable inputs, buttons & controls, and show loading hint
             endpointInput.isEnabled = false
             endpointInput.hint = getString(R.string.loading)
             btnSetEndpoint.isEnabled = false
             languageCodeInput.isEnabled = false
             languageCodeInput.hint = getString(R.string.loading)
             btnSetLanguageCode.isEnabled = false
+            apiKeyInput.hint = getString(R.string.loading)
+            btnSetApiKey.isEnabled = false
+            requestStyleOption.isEnabled = false
 
-            // Retrieve stored endpoint & language code
+            // Retrieve stored endpoint, language code, api key & request style
             val retrievedEndpoint = withContext(Dispatchers.IO) {
                 return@withContext dataStore.data.map { preferences ->
                     preferences[ENDPOINT]
@@ -88,6 +97,18 @@ class MainActivity : AppCompatActivity() {
                 }.first()
             }
 
+            val retrievedRequestStyle = withContext(Dispatchers.IO) {
+                return@withContext dataStore.data.map { preferences ->
+                    preferences[REQUEST_STYLE]
+                }.first()
+            }
+
+            val retrievedApiKey = withContext(Dispatchers.IO) {
+                return@withContext dataStore.data.map { preferences ->
+                    preferences[API_KEY]
+                }.first()
+            }
+
             // Set retrieved endpoint in input, or set hint
             if (retrievedEndpoint.isNullOrEmpty()) {
                 endpointInput.hint = getString(R.string.endpoint_hint)
@@ -96,11 +117,30 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Set retrieved endpoint input, or set hint
-            // TODO: This could a dropdown list?
+            // TODO: This could a dropdown list? Or radio group?
             if (retrievedLanguageCode.isNullOrEmpty()) {
                 languageCodeInput.hint = getString(R.string.language_code_hint)
             } else {
                 languageCodeInput.setText(retrievedLanguageCode)
+            }
+
+            // Set retrieved request style, or assign a default
+            if (retrievedRequestStyle == null) {
+                dataStore.edit { settings ->
+                    settings[REQUEST_STYLE] = true
+                }
+                requestStyleOption.check(R.id.radio_btn_openai_api)
+            } else if (retrievedRequestStyle) {
+                requestStyleOption.check(R.id.radio_btn_openai_api)
+            } else {
+                requestStyleOption.check(R.id.radio_btn_whisper_webservice)
+            }
+
+            // Set retrieved api key
+            if (retrievedApiKey.isNullOrEmpty()) {
+                apiKeyInput.hint = getString(R.string.api_key_hint)
+            } else {
+                apiKeyInput.setText(retrievedApiKey)
             }
 
             // Re-enable input & button
@@ -108,10 +148,17 @@ class MainActivity : AppCompatActivity() {
             btnSetEndpoint.isEnabled = true
             languageCodeInput.isEnabled = true
             btnSetLanguageCode.isEnabled = true
+            apiKeyInput.isEnabled = true
+            btnSetApiKey.isEnabled = true
+            requestStyleOption.isEnabled = true
 
             // After retrieval is done, assign onClick event to the set buttons
             btnSetEndpoint.setOnClickListener { onSetConfig(context, ENDPOINT, endpointInput.text.toString()) }
             btnSetLanguageCode.setOnClickListener { onSetConfig(context, LANGUAGE_CODE, languageCodeInput.text.toString()) }
+            requestStyleOption.setOnCheckedChangeListener { _, checkedId ->
+                onSetConfig(context, REQUEST_STYLE, (checkedId == R.id.radio_btn_openai_api))
+            }
+            btnSetApiKey.setOnClickListener { onSetConfig(context, API_KEY, apiKeyInput.text.toString()) }
         }
     }
 
