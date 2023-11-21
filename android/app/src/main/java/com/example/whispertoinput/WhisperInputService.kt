@@ -14,7 +14,7 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
-
+private const val AUDIO_MEDIA_TYPE = "audio/mp4"
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
@@ -67,6 +67,7 @@ class WhisperInputService : InputMethodService() {
         whisperJobManager.startAsync(
             this,
             recordedAudioFilename,
+            AUDIO_MEDIA_TYPE,
             { transcriptionCallback(it) },
             { transcriptionExceptionCallback(it) }
         )

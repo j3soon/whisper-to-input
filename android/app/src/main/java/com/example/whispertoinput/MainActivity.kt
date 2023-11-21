@@ -30,6 +30,7 @@ private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
+val API_KEY = stringPreferencesKey("api-key")
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
