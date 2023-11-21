@@ -11,7 +11,7 @@
     <string name="microphone">Microphone</string>
     <string name="set">Set</string>
     <string name="loading">Loading...</string>
-    <string name="api_key_successfully_set">API Key successfully set!</string>
+    <string name="successfully_set">Successfully set!</string>
     <string name="endpoint">Endpoint</string>
     <string name="endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
     <string name="language_code">Language Code</string>
