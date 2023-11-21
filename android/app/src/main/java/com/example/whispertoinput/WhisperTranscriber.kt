@@ -1,16 +1,14 @@
 package com.example.whispertoinput
 
 import android.content.Context
-import android.util.Log
-import com.aallam.openai.api.audio.TranscriptionRequest
-import com.aallam.openai.api.file.FileSource
-import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import okio.FileSystem
-import okio.Path.Companion.toPath
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 class WhisperTranscriber {
     private var currentTranscriptionJob: Job? = null
@@ -22,23 +20,14 @@ class WhisperTranscriber {
         exceptionCallback: (String) -> Unit
     ) {
         suspend fun makeWhisperRequest(): String {
-            val apiKey = context.dataStore.data.map { preferences ->
-                preferences[API_KEY]
-            }.first()
-            val openai = OpenAI(
-                token = apiKey ?: "",
+            val client = OkHttpClient()
+            val request = buildWhisperRequest(
+                filename,
+                "http://192.168.1.110:9000/asr?encode=true&task=transcribe&language=zh&word_timestamps=false&output=txt",
+                "audio/mp4"
             )
-            val request = TranscriptionRequest(
-                audio = FileSource(
-                    name = filename,
-                    source = FileSystem.SYSTEM.source(filename.toPath())
-                ),
-                model = ModelId("whisper-1"),
-                language = "zh"
-            )
-            val transcription = openai.transcription(request)
-
-            return transcription.text
+            val response = client.newCall(request).execute()
+            return response.body!!.string()
         }
 
         // Create a cancellable job in the main thread (for UI updating)
@@ -78,5 +67,19 @@ class WhisperTranscriber {
     private fun registerTranscriptionJob(job: Job?) {
         currentTranscriptionJob?.cancel()
         currentTranscriptionJob = job
+    }
+
+    private fun buildWhisperRequest(filename: String, url: String, mediaType: String): Request {
+        val file: File = File(filename)
+        val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
+        val requestBody: RequestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("audio_file", "@audio.m4a", fileBody)
+            .build()
+
+        return Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
     }
 }
