@@ -16,4 +16,9 @@
     <string name="endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
     <string name="language_code">Language Code</string>
     <string name="language_code_hint">Enter Language Code (e.g., en, zh)</string>
+    <string name="api_key_hint">Enter OpenAI API Key...</string>
+    <string name="api_key">API Key</string>
+    <string name="option_whisper_webservice">Whisper Webservice</string>
+    <string name="option_openai_api">OpenAI API</string>
+    <string name="request_style">Request Style</string>
 </resources>

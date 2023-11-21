@@ -135,7 +135,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="center_vertical"
-                android:text="Request Style"
+                android:text="@string/request_style"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/radio_request_style"
                 app:layout_constraintEnd_toStartOf="@+id/radio_request_style"
@@ -155,13 +155,13 @@
                     android:id="@+id/radio_btn_openai_api"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="OpenAI API" />
+                    android:text="@string/option_openai_api" />
 
                 <RadioButton
                     android:id="@+id/radio_btn_whisper_webservice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Whisper Webservice" />
+                    android:text="@string/option_whisper_webservice" />
             </RadioGroup>
 
             <TextView
@@ -169,7 +169,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:gravity="center_vertical"
-                android:text="API Key"
+                android:text="@string/api_key"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
                 app:layout_constraintEnd_toStartOf="@+id/edittext_api_key"
@@ -185,7 +185,7 @@
                 android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:gravity="start|top"
-                android:hint="Enter OpenAI API Key..."
+                android:hint="@string/api_key_hint"
                 android:inputType="textMultiLine"
                 android:minHeight="48dp"
                 app:layout_constraintEnd_toStartOf="@+id/btn_set_language_code"
