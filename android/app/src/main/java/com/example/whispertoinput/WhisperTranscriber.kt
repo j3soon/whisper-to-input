@@ -1,6 +1,7 @@
 package com.example.whispertoinput
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -14,6 +15,13 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 class WhisperTranscriber {
+    private data class Config(
+        val endpoint: String,
+        val languageCode: String,
+        val isRequestStyleOpenaiApi: Boolean,
+        val apiKey: String
+    )
+
     private var currentTranscriptionJob: Job? = null
 
     fun startAsync(
@@ -25,15 +33,14 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val endpoint = context.dataStore.data.map { preferences ->
-                preferences[ENDPOINT]
-            }.first() ?: ""
-            val languageCode = context.dataStore.data.map { preferences ->
-                preferences[LANGUAGE_CODE]
-            }.first() ?: "en"
-            val apiKey = context.dataStore.data.map { preferences ->
-                preferences[API_KEY]
-            }.first() ?: ""
+            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey) = context.dataStore.data.map { preferences: Preferences ->
+                Config(
+                    preferences[ENDPOINT] ?: "",
+                    preferences[LANGUAGE_CODE] ?: "en",
+                    preferences[REQUEST_STYLE] ?: true,
+                    preferences[API_KEY] ?: ""
+                )
+            }.first()
 
             // Make request
             val client = OkHttpClient()
@@ -41,7 +48,8 @@ class WhisperTranscriber {
                 filename,
                 "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt",
                 mediaType,
-                apiKey
+                apiKey,
+                isRequestStyleOpenaiApi
             )
             val response = client.newCall(request).execute()
             return response.body!!.string()
@@ -86,21 +94,32 @@ class WhisperTranscriber {
         currentTranscriptionJob = job
     }
 
-    private fun buildWhisperRequest(filename: String, url: String, mediaType: String, apiKey: String): Request {
+    private fun buildWhisperRequest(
+        filename: String,
+        url: String,
+        mediaType: String,
+        apiKey: String,
+        isRequestStyleOpenaiApi: Boolean
+    ): Request {
         val file: File = File(filename)
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
             setType(MultipartBody.FORM)
             addFormDataPart("audio_file", "@audio.m4a", fileBody)
-            addFormDataPart("file", "@audio.m4a", fileBody)
-            addFormDataPart("model", "whisper-1")
-            addFormDataPart("response_format", "text")
+
+            if (isRequestStyleOpenaiApi) {
+                addFormDataPart("file", "@audio.m4a", fileBody)
+                addFormDataPart("model", "whisper-1")
+                addFormDataPart("response_format", "text")
+            }
         }.build()
 
-        val requestHeaders: Headers = Headers.Builder()
-            .add("Authorization", "Bearer $apiKey")
-            .add("Content-Type", "multipart/form-data")
-            .build()
+        val requestHeaders: Headers = Headers.Builder().apply {
+            if (isRequestStyleOpenaiApi) {
+                add("Authorization", "Bearer $apiKey")
+            }
+            add("Content-Type", "multipart/form-data")
+        }.build()
 
         return Request.Builder()
             .headers(requestHeaders)
