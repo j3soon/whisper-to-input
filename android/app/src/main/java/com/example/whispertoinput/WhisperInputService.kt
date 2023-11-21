@@ -23,7 +23,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun transcriptionCallback(text: String?) {
         if (!text.isNullOrEmpty()) {
-            currentInputConnection?.commitText(text, text.length)
+            currentInputConnection?.commitText(text, 1)
         }
 
         whisperKeyboard.reset()
