@@ -52,6 +52,11 @@ class WhisperTranscriber {
                 isRequestStyleOpenaiApi
             )
             val response = client.newCall(request).execute()
+
+            // If request is not successful, or response code is weird
+            if (!response.isSuccessful || response.code / 100 != 2) {
+                throw Exception(response.body!!.string().replace('\n', ' '))
+            }
             return response.body!!.string()
         }
 
