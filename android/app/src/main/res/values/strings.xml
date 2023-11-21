@@ -8,10 +8,12 @@
     <string name="start_transcribing">Start transcribing.</string>
     <string name="grant_microphone_permission">Grant Microphone Permission</string>
     <string name="mic_permission_required">Whisper to Input requires microphone usage to work.</string>
-    <string name="enter_openai_api_key">Enter OpenAI API Key</string>
-    <string name="api_key">API Key</string>
     <string name="microphone">Microphone</string>
     <string name="set">Set</string>
     <string name="loading">Loading...</string>
     <string name="api_key_successfully_set">API Key successfully set!</string>
+    <string name="endpoint">Endpoint</string>
+    <string name="endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
+    <string name="language_code">Language Code</string>
+    <string name="language_code_hint">Enter Language Code (e.g., en, zh)</string>
 </resources>
