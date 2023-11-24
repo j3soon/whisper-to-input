@@ -52,6 +52,11 @@ class WhisperInputService : InputMethodService() {
                 inputMethodManager.shouldOfferSwitchingToNextInputMethod(token)
             }
 
+        // Sets up recorder manager
+        recorderManager.setOnUpdateMicrophoneAmplitude { amplitude ->
+            onUpdateMicrophoneAmplitude(amplitude)
+        }
+
         // Returns the keyboard after setting it up and inflating its layout
         return whisperKeyboard.setup(
             layoutInflater,
@@ -75,6 +80,10 @@ class WhisperInputService : InputMethodService() {
         }
 
         recorderManager.start(this, recordedAudioFilename)
+    }
+
+    private fun onUpdateMicrophoneAmplitude(amplitude: Int) {
+        whisperKeyboard.updateMicrophoneAmplitude(amplitude)
     }
 
     private fun onCancelRecording() {

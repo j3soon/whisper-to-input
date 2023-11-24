@@ -1,6 +1,7 @@
 package com.example.whispertoinput
 
 import android.animation.TimeInterpolator
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.inflate
@@ -9,6 +10,17 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.math.MathUtils
+import androidx.core.view.children
+import kotlin.math.log10
+import kotlin.math.pow
+
+private const val AMPLITUDE_CLAMP_MIN: Int = 10
+private const val AMPLITUDE_CLAMP_MAX: Int = 25000
+private const val LOG_10_10: Float = 1.0F
+private const val LOG_10_25000: Float = 4.398F
+private const val AMPLITUDE_ANIMATION_DURATION: Long = 500
+private val amplitudePowers: Array<Float> = arrayOf(0.5f, 1.0f, 2f, 3f)
 
 class WhisperKeyboard {
     private enum class KeyboardStatus {
@@ -101,6 +113,26 @@ class WhisperKeyboard {
 
     fun reset() {
         setKeyboardStatus(KeyboardStatus.Idle)
+    }
+
+    fun updateMicrophoneAmplitude(amplitude: Int) {
+        val clampedAmplitude = MathUtils.clamp(
+            amplitude,
+            AMPLITUDE_CLAMP_MIN,
+            AMPLITUDE_CLAMP_MAX
+        )
+
+        // decibel-like calculation
+        val normalizedPower = (log10(clampedAmplitude * 1f) - LOG_10_10) / (LOG_10_25000 - LOG_10_10)
+
+        // normalizedPower ranges from 0 to 1.
+        // The inner-most ripple should be the most sensitive to audio,
+        // represented by a gamma-correction-like curve.
+        for (micRippleIdx in micRipples.indices) {
+            micRipples[micRippleIdx].clearAnimation()
+            micRipples[micRippleIdx].alpha = normalizedPower.pow(amplitudePowers[micRippleIdx])
+            micRipples[micRippleIdx].animate().alpha(0f).setDuration(AMPLITUDE_ANIMATION_DURATION).start()
+        }
     }
 
     private fun onButtonBackspaceClick() {
