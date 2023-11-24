@@ -11,6 +11,7 @@ import java.io.IOException
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.text.TextUtils
 import android.widget.Toast
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
@@ -43,7 +44,8 @@ class WhisperInputService : InputMethodService() {
             { onStartRecording() },
             { onCancelRecording() },
             { onStartTranscription() },
-            { onCancelTranscription() })
+            { onCancelTranscription() },
+            { onDeleteText() })
     }
 
     private fun onStartRecording() {
@@ -75,6 +77,18 @@ class WhisperInputService : InputMethodService() {
 
     private fun onCancelTranscription() {
         whisperJobManager.stop()
+    }
+
+    private fun onDeleteText() {
+        val inputConnection = currentInputConnection ?: return
+        val selectedText = inputConnection.getSelectedText(0)
+
+        // Deletes cursor pointed text, or all selected texts
+        if (TextUtils.isEmpty(selectedText)) {
+            inputConnection.deleteSurroundingText(1, 0)
+        } else {
+            inputConnection.commitText("", 1)
+        }
     }
 
     // Opens up app MainActivity

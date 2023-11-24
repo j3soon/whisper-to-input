@@ -20,6 +20,7 @@ class WhisperKeyboard {
     private var onCancelRecording: () -> Unit = { }
     private var onStartTranscribing: () -> Unit = { }
     private var onCancelTranscribing: () -> Unit = { }
+    private var onButtonBackspace: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -30,13 +31,15 @@ class WhisperKeyboard {
     private var buttonRecordingDone: ImageButton? = null
     private var labelStatus: TextView? = null
     private var waitingIcon: ProgressBar? = null
+    private var buttonBackspace: ImageButton? = null
 
     fun setup(
         layoutInflater: LayoutInflater,
         onStartRecording: () -> Unit,
         onCancelRecording: () -> Unit,
         onStartTranscribing: () -> Unit,
-        onCancelTranscribing: () -> Unit
+        onCancelTranscribing: () -> Unit,
+        onButtonBackspace: () -> Unit
     ): View {
         // Inflate the keyboard layout & assign views
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
@@ -44,16 +47,19 @@ class WhisperKeyboard {
         buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
+        buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as ImageButton
 
         // Set onClick listeners
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonRecordingDone!!.setOnClickListener { onButtonRecordingDoneClick() }
+        buttonBackspace!!.setOnClickListener { onButtonBackspaceClick() }
 
         // Set event listeners
         this.onStartRecording = onStartRecording
         this.onCancelRecording = onCancelRecording
         this.onStartTranscribing = onStartTranscribing
         this.onCancelTranscribing = onCancelTranscribing
+        this.onButtonBackspace = onButtonBackspace
 
         // Resets keyboard upon setup
         reset()
@@ -64,6 +70,11 @@ class WhisperKeyboard {
 
     fun reset() {
         setKeyboardStatus(KeyboardStatus.Idle)
+    }
+
+    private fun onButtonBackspaceClick() {
+        // Currently, this onClick only makes a call to onButtonBackspace()
+        this.onButtonBackspace()
     }
 
     private fun onButtonMicClick() {
