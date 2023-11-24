@@ -82,4 +82,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_status"
         android:contentDescription="@string/backspace_button_hint" />
+
+    <ImageButton
+        android:id="@+id/btn_previous_ime"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="#00000000"
+        android:contentDescription="@string/backspace_button_hint"
+        android:scaleType="fitCenter"
+        android:src="@drawable/btn_previous_ime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

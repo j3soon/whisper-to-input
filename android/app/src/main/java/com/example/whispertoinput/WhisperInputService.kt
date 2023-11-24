@@ -11,11 +11,15 @@ import java.io.IOException
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.IBinder
 import android.text.TextUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
+private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
+
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
@@ -38,14 +42,26 @@ class WhisperInputService : InputMethodService() {
         // Assigns the file name for recorded audio
         recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
 
+        // Should offer ime switch?
+        val shouldOfferImeSwitch: Boolean =
+            if (Build.VERSION.SDK_INT >= IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL) {
+                shouldOfferSwitchingToNextInputMethod()
+            } else {
+                val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                val token: IBinder? = window?.window?.attributes?.token
+                inputMethodManager.shouldOfferSwitchingToNextInputMethod(token)
+            }
+
         // Returns the keyboard after setting it up and inflating its layout
         return whisperKeyboard.setup(
             layoutInflater,
+            shouldOfferImeSwitch,
             { onStartRecording() },
             { onCancelRecording() },
             { onStartTranscription() },
             { onCancelTranscription() },
-            { onDeleteText() })
+            { onDeleteText() },
+            { onSwitchIme() })
     }
 
     private fun onStartRecording() {
@@ -89,6 +105,18 @@ class WhisperInputService : InputMethodService() {
         } else {
             inputConnection.commitText("", 1)
         }
+    }
+
+    private fun onSwitchIme() {
+        // Before API Level 28, switchToPreviousInputMethod() was not available
+        if (Build.VERSION.SDK_INT >= IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL) {
+            switchToPreviousInputMethod()
+        } else {
+            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            val token: IBinder? = window?.window?.attributes?.token
+            inputMethodManager.switchToLastInputMethod(token)
+        }
+
     }
 
     // Opens up app MainActivity

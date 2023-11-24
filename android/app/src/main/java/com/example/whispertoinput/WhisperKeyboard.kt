@@ -21,6 +21,7 @@ class WhisperKeyboard {
     private var onStartTranscribing: () -> Unit = { }
     private var onCancelTranscribing: () -> Unit = { }
     private var onButtonBackspace: () -> Unit = { }
+    private var onSwitchIme: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -32,14 +33,17 @@ class WhisperKeyboard {
     private var labelStatus: TextView? = null
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: ImageButton? = null
+    private var buttonPreviousIme: ImageButton? = null
 
     fun setup(
         layoutInflater: LayoutInflater,
+        shouldOfferImeSwitch: Boolean,
         onStartRecording: () -> Unit,
         onCancelRecording: () -> Unit,
         onStartTranscribing: () -> Unit,
         onCancelTranscribing: () -> Unit,
-        onButtonBackspace: () -> Unit
+        onButtonBackspace: () -> Unit,
+        onSwitchIme: () -> Unit
     ): View {
         // Inflate the keyboard layout & assign views
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
@@ -48,11 +52,20 @@ class WhisperKeyboard {
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as ImageButton
+        buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
+
+        // Hide buttonPreviousIme if necessary
+        if (!shouldOfferImeSwitch) {
+            buttonPreviousIme!!.visibility = View.GONE
+        }
 
         // Set onClick listeners
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonRecordingDone!!.setOnClickListener { onButtonRecordingDoneClick() }
         buttonBackspace!!.setOnClickListener { onButtonBackspaceClick() }
+        if (shouldOfferImeSwitch) {
+            buttonPreviousIme!!.setOnClickListener { onButtonPreviousImeClick() }
+        }
 
         // Set event listeners
         this.onStartRecording = onStartRecording
@@ -60,6 +73,7 @@ class WhisperKeyboard {
         this.onStartTranscribing = onStartTranscribing
         this.onCancelTranscribing = onCancelTranscribing
         this.onButtonBackspace = onButtonBackspace
+        this.onSwitchIme = onSwitchIme
 
         // Resets keyboard upon setup
         reset()
@@ -75,6 +89,11 @@ class WhisperKeyboard {
     private fun onButtonBackspaceClick() {
         // Currently, this onClick only makes a call to onButtonBackspace()
         this.onButtonBackspace()
+    }
+
+    private fun onButtonPreviousImeClick() {
+        // Currently, this onClick only makes a call to onSwitchIme()
+        this.onSwitchIme()
     }
 
     private fun onButtonMicClick() {
