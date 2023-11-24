@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:text="@string/whisper_to_input"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_mic_frame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,9 +90,9 @@
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:backgroundTint="#00000000"
-        android:contentDescription="@string/backspace_button_hint"
+        android:contentDescription="@string/btn_previous_ime_hint"
         android:scaleType="fitCenter"
         android:src="@drawable/btn_previous_ime"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/label_status" />
 </androidx.constraintlayout.widget.ConstraintLayout>
