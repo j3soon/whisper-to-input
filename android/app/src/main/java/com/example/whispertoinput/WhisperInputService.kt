@@ -25,6 +25,7 @@ class WhisperInputService : InputMethodService() {
     private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager = RecorderManager()
     private var recordedAudioFilename: String = ""
+    private var isFirstTime: Boolean = true
 
     private fun transcriptionCallback(text: String?) {
         if (!text.isNullOrEmpty()) {
@@ -47,7 +48,8 @@ class WhisperInputService : InputMethodService() {
             if (Build.VERSION.SDK_INT >= IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL) {
                 shouldOfferSwitchingToNextInputMethod()
             } else {
-                val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                val inputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 val token: IBinder? = window?.window?.attributes?.token
                 inputMethodManager.shouldOfferSwitchingToNextInputMethod(token)
             }
@@ -145,10 +147,16 @@ class WhisperInputService : InputMethodService() {
         whisperJobManager.stop()
         whisperKeyboard.reset()
         recorderManager.stop()
+
+        // If this is the first time calling onWindowShown, it means this IME is just being switched to
+        // Automatically starts recording after switching to Whisper Input
+        if (isFirstTime) {
+            isFirstTime = false
+            whisperKeyboard.invokeMicButton()
+        }
     }
 
     override fun onWindowHidden() {
-
         super.onWindowHidden()
         whisperJobManager.stop()
         whisperKeyboard.reset()

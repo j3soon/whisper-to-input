@@ -135,6 +135,11 @@ class WhisperKeyboard {
         }
     }
 
+    // Simulate a click on mic button
+    fun invokeMicButton() {
+        onButtonMicClick()
+    }
+
     private fun onButtonBackspaceClick() {
         // Currently, this onClick only makes a call to onButtonBackspace()
         this.onButtonBackspace()
