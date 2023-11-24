@@ -116,6 +116,10 @@ class WhisperKeyboard {
     }
 
     fun updateMicrophoneAmplitude(amplitude: Int) {
+        if (keyboardStatus != KeyboardStatus.Recording) {
+            return
+        }
+
         val clampedAmplitude = MathUtils.clamp(
             amplitude,
             AMPLITUDE_CLAMP_MIN,
