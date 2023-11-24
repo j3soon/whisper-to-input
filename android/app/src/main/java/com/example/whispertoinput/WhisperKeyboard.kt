@@ -1,9 +1,11 @@
 package com.example.whispertoinput
 
+import android.animation.TimeInterpolator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.inflate
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -36,6 +38,8 @@ class WhisperKeyboard {
     private var buttonBackspace: ImageButton? = null
     private var buttonPreviousIme: ImageButton? = null
     private var buttonSettings: ImageButton? = null
+    private var micRippleContainer: ConstraintLayout? = null
+    private var micRipples: Array<ImageView> = emptyArray()
 
     fun setup(
         layoutInflater: LayoutInflater,
@@ -57,6 +61,13 @@ class WhisperKeyboard {
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as ImageButton
         buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
         buttonSettings = keyboardView!!.findViewById(R.id.btn_settings) as ImageButton
+        micRippleContainer = keyboardView!!.findViewById(R.id.mic_ripples) as ConstraintLayout
+        micRipples = arrayOf(
+            keyboardView!!.findViewById(R.id.mic_ripple_0) as ImageView,
+            keyboardView!!.findViewById(R.id.mic_ripple_1) as ImageView,
+            keyboardView!!.findViewById(R.id.mic_ripple_2) as ImageView,
+            keyboardView!!.findViewById(R.id.mic_ripple_3) as ImageView
+        )
 
         // Hide buttonPreviousIme if necessary
         if (!shouldOfferImeSwitch) {
@@ -151,6 +162,7 @@ class WhisperKeyboard {
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonRecordingDone!!.visibility = View.GONE
+                micRippleContainer!!.visibility = View.GONE
             }
 
             KeyboardStatus.Recording -> {
@@ -158,6 +170,7 @@ class WhisperKeyboard {
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonRecordingDone!!.visibility = View.VISIBLE
+                micRippleContainer!!.visibility = View.VISIBLE
             }
 
             KeyboardStatus.Waiting -> {
@@ -165,6 +178,7 @@ class WhisperKeyboard {
                 buttonMic!!.setImageResource(R.drawable.mic_transcribing)
                 waitingIcon!!.visibility = View.VISIBLE
                 buttonRecordingDone!!.visibility = View.GONE
+                micRippleContainer!!.visibility = View.GONE
             }
         }
 
