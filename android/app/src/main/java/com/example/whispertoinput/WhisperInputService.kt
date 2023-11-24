@@ -61,7 +61,8 @@ class WhisperInputService : InputMethodService() {
             { onStartTranscription() },
             { onCancelTranscription() },
             { onDeleteText() },
-            { onSwitchIme() })
+            { onSwitchIme() },
+            { onOpenSettings() })
     }
 
     private fun onStartRecording() {
@@ -117,6 +118,10 @@ class WhisperInputService : InputMethodService() {
             inputMethodManager.switchToLastInputMethod(token)
         }
 
+    }
+
+    private fun onOpenSettings() {
+        launchMainActivity()
     }
 
     // Opens up app MainActivity

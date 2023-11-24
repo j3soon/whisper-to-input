@@ -22,6 +22,7 @@ class WhisperKeyboard {
     private var onCancelTranscribing: () -> Unit = { }
     private var onButtonBackspace: () -> Unit = { }
     private var onSwitchIme: () -> Unit = { }
+    private var onOpenSettings: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -34,6 +35,7 @@ class WhisperKeyboard {
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: ImageButton? = null
     private var buttonPreviousIme: ImageButton? = null
+    private var buttonSettings: ImageButton? = null
 
     fun setup(
         layoutInflater: LayoutInflater,
@@ -43,7 +45,8 @@ class WhisperKeyboard {
         onStartTranscribing: () -> Unit,
         onCancelTranscribing: () -> Unit,
         onButtonBackspace: () -> Unit,
-        onSwitchIme: () -> Unit
+        onSwitchIme: () -> Unit,
+        onOpenSettings: () -> Unit
     ): View {
         // Inflate the keyboard layout & assign views
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
@@ -53,6 +56,7 @@ class WhisperKeyboard {
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as ImageButton
         buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
+        buttonSettings = keyboardView!!.findViewById(R.id.btn_settings) as ImageButton
 
         // Hide buttonPreviousIme if necessary
         if (!shouldOfferImeSwitch) {
@@ -62,6 +66,7 @@ class WhisperKeyboard {
         // Set onClick listeners
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonRecordingDone!!.setOnClickListener { onButtonRecordingDoneClick() }
+        buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setOnClickListener { onButtonBackspaceClick() }
         if (shouldOfferImeSwitch) {
             buttonPreviousIme!!.setOnClickListener { onButtonPreviousImeClick() }
@@ -74,6 +79,7 @@ class WhisperKeyboard {
         this.onCancelTranscribing = onCancelTranscribing
         this.onButtonBackspace = onButtonBackspace
         this.onSwitchIme = onSwitchIme
+        this.onOpenSettings = onOpenSettings
 
         // Resets keyboard upon setup
         reset()
@@ -94,6 +100,11 @@ class WhisperKeyboard {
     private fun onButtonPreviousImeClick() {
         // Currently, this onClick only makes a call to onSwitchIme()
         this.onSwitchIme()
+    }
+
+    private fun onButtonSettingsClick() {
+        // Currently, this onClick only makes a call to onOpenSettings()
+        this.onOpenSettings()
     }
 
     private fun onButtonMicClick() {
