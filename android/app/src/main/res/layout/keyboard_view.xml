@@ -35,17 +35,21 @@
 
     <FrameLayout
         android:id="@+id/btn_mic_frame"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="135dp"
+        android:layout_height="135dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_status">
 
+
+
+
         <ImageButton
             android:id="@+id/btn_mic"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:background="#00FFFFFF"
             android:contentDescription="@string/start_speech_to_text"
             android:scaleType="fitCenter"
@@ -56,22 +60,71 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:layout_margin="10dp"
             android:clickable="false"
             android:focusable="false"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mic_ripples"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible">
+
+            <ImageView
+                android:id="@+id/mic_ripple_0"
+                android:layout_width="107dp"
+                android:layout_height="107dp"
+                android:src="@drawable/mic_ripple_0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/mic_ripple_1"
+                android:layout_width="115dp"
+                android:layout_height="115dp"
+                android:src="@drawable/mic_ripple_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/mic_ripple_2"
+                android:layout_width="123dp"
+                android:layout_height="123dp"
+                android:src="@drawable/mic_ripple_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/mic_ripple_3"
+                android:layout_width="131dp"
+                android:layout_height="131dp"
+                android:src="@drawable/mic_ripple_3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </FrameLayout>
+
 
     <ImageButton
         android:id="@+id/btn_recording_done"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="16dp"
         android:background="#00FFFFFF"
-        android:scaleType="fitCenter"
         android:contentDescription="@string/start_transcribing"
+        android:scaleType="fitCenter"
         android:src="@drawable/recording_done"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
@@ -79,19 +132,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/btn_mic_frame"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"/>
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageButton
         android:id="@+id/btn_backspace"
         android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:backgroundTint="#00000000"
         android:contentDescription="@string/backspace_button_hint"
         android:scaleType="fitCenter"
         android:src="@drawable/btn_backspace"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
-        app:layout_constraintStart_toEndOf="@+id/btn_recording_done"
+        app:layout_constraintStart_toEndOf="@+id/btn_mic_frame"
         app:layout_constraintTop_toTopOf="@+id/btn_mic_frame" />
 
     <ImageButton
@@ -115,7 +167,6 @@
         android:contentDescription="@string/btn_previous_ime_hint"
         android:scaleType="fitCenter"
         android:src="@drawable/btn_settings"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
         app:layout_constraintEnd_toStartOf="@+id/btn_mic_frame"
         app:layout_constraintTop_toTopOf="@+id/btn_mic_frame" />
 </androidx.constraintlayout.widget.ConstraintLayout>
