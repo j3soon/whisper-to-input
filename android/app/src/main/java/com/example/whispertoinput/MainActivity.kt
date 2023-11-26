@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // The onClick event of set config buttons
-    private fun <T>onSetConfig(context: Context, key: Preferences.Key<T>, newValue: T) {
+    private fun <T> onSetConfig(context: Context, key: Preferences.Key<T>, newValue: T) {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 dataStore.edit { settings ->

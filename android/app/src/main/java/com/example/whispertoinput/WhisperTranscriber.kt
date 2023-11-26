@@ -106,6 +106,10 @@ class WhisperTranscriber {
         apiKey: String,
         isRequestStyleOpenaiApi: Boolean
     ): Request {
+        // Please refer to the following for the endpoint/payload definitions:
+        // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
+        // - https://platform.openai.com/docs/api-reference/audio/createTranscription
+        // - https://platform.openai.com/docs/api-reference/making-requests
         val file: File = File(filename)
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
