@@ -26,10 +26,17 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.File
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
+private const val AMPLITUDE_UPDATE_PERIOD: Long = 150
 
 class RecorderManager {
     companion object {
@@ -37,6 +44,8 @@ class RecorderManager {
     }
 
     private var recorder: MediaRecorder? = null
+    private var onUpdateMicrophoneAmplitude: (Int) -> Unit = { }
+    private var microhphoneAmplitudeUpdateJob: Job? = null
 
     fun start(context: Context, filename: String) {
         recorder?.apply {
@@ -65,6 +74,16 @@ class RecorderManager {
 
             start()
         }
+
+        // Start a job to periodically report current amplitude
+        microhphoneAmplitudeUpdateJob?.cancel()
+        microhphoneAmplitudeUpdateJob = CoroutineScope(Dispatchers.Main).launch {
+            while (recorder != null) {
+                val amplitude = recorder?.maxAmplitude ?: 0
+                onUpdateMicrophoneAmplitude(amplitude)
+                delay(AMPLITUDE_UPDATE_PERIOD)
+            }
+        }
     }
 
     fun stop() {
@@ -73,6 +92,14 @@ class RecorderManager {
             release()
         }
         recorder = null
+
+        microhphoneAmplitudeUpdateJob?.cancel()
+        microhphoneAmplitudeUpdateJob = null
+    }
+
+    // Assign onUpdateMicrophoneAmplitude callback
+    fun setOnUpdateMicrophoneAmplitude(onUpdateMicrophoneAmplitude: (Int) -> Unit) {
+        this.onUpdateMicrophoneAmplitude = onUpdateMicrophoneAmplitude
     }
 
     // Returns whether all of the permissions are granted.

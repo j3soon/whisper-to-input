@@ -21,4 +21,6 @@
     <string name="option_whisper_webservice">Whisper Webservice</string>
     <string name="option_openai_api">OpenAI API</string>
     <string name="request_style">Request Style</string>
+    <string name="backspace_button_hint">Backspace Button</string>
+    <string name="btn_previous_ime_hint">Switch To Previous Input Method</string>
 </resources>

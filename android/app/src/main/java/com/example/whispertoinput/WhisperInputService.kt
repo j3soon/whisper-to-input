@@ -30,15 +30,21 @@ import java.io.IOException
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.IBinder
+import android.text.TextUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
+private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
+
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager = RecorderManager()
     private var recordedAudioFilename: String = ""
+    private var isFirstTime: Boolean = true
 
     private fun transcriptionCallback(text: String?) {
         if (!text.isNullOrEmpty()) {
@@ -56,13 +62,33 @@ class WhisperInputService : InputMethodService() {
         // Assigns the file name for recorded audio
         recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
 
+        // Should offer ime switch?
+        val shouldOfferImeSwitch: Boolean =
+            if (Build.VERSION.SDK_INT >= IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL) {
+                shouldOfferSwitchingToNextInputMethod()
+            } else {
+                val inputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                val token: IBinder? = window?.window?.attributes?.token
+                inputMethodManager.shouldOfferSwitchingToNextInputMethod(token)
+            }
+
+        // Sets up recorder manager
+        recorderManager.setOnUpdateMicrophoneAmplitude { amplitude ->
+            onUpdateMicrophoneAmplitude(amplitude)
+        }
+
         // Returns the keyboard after setting it up and inflating its layout
         return whisperKeyboard.setup(
             layoutInflater,
+            shouldOfferImeSwitch,
             { onStartRecording() },
             { onCancelRecording() },
             { onStartTranscription() },
-            { onCancelTranscription() })
+            { onCancelTranscription() },
+            { onDeleteText() },
+            { onSwitchIme() },
+            { onOpenSettings() })
     }
 
     private fun onStartRecording() {
@@ -75,6 +101,10 @@ class WhisperInputService : InputMethodService() {
         }
 
         recorderManager.start(this, recordedAudioFilename)
+    }
+
+    private fun onUpdateMicrophoneAmplitude(amplitude: Int) {
+        whisperKeyboard.updateMicrophoneAmplitude(amplitude)
     }
 
     private fun onCancelRecording() {
@@ -96,6 +126,34 @@ class WhisperInputService : InputMethodService() {
         whisperJobManager.stop()
     }
 
+    private fun onDeleteText() {
+        val inputConnection = currentInputConnection ?: return
+        val selectedText = inputConnection.getSelectedText(0)
+
+        // Deletes cursor pointed text, or all selected texts
+        if (TextUtils.isEmpty(selectedText)) {
+            inputConnection.deleteSurroundingText(1, 0)
+        } else {
+            inputConnection.commitText("", 1)
+        }
+    }
+
+    private fun onSwitchIme() {
+        // Before API Level 28, switchToPreviousInputMethod() was not available
+        if (Build.VERSION.SDK_INT >= IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL) {
+            switchToPreviousInputMethod()
+        } else {
+            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            val token: IBinder? = window?.window?.attributes?.token
+            inputMethodManager.switchToLastInputMethod(token)
+        }
+
+    }
+
+    private fun onOpenSettings() {
+        launchMainActivity()
+    }
+
     // Opens up app MainActivity
     private fun launchMainActivity() {
         val dialogIntent = Intent(this, MainActivity::class.java)
@@ -108,10 +166,16 @@ class WhisperInputService : InputMethodService() {
         whisperJobManager.stop()
         whisperKeyboard.reset()
         recorderManager.stop()
+
+        // If this is the first time calling onWindowShown, it means this IME is just being switched to
+        // Automatically starts recording after switching to Whisper Input
+        if (isFirstTime) {
+            isFirstTime = false
+            whisperKeyboard.invokeMicButton()
+        }
     }
 
     override fun onWindowHidden() {
-
         super.onWindowHidden()
         whisperJobManager.stop()
         whisperKeyboard.reset()
