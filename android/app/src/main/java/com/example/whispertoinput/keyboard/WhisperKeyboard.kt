@@ -1,17 +1,17 @@
-package com.example.whispertoinput
+package com.example.whispertoinput.keyboard
 
-import android.animation.TimeInterpolator
 import android.util.Log
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
-import android.view.View.inflate
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.math.MathUtils
-import androidx.core.view.children
+import com.example.whispertoinput.R
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -47,7 +47,7 @@ class WhisperKeyboard {
     private var buttonRecordingDone: ImageButton? = null
     private var labelStatus: TextView? = null
     private var waitingIcon: ProgressBar? = null
-    private var buttonBackspace: ImageButton? = null
+    private var buttonBackspace: BackspaceButton? = null
     private var buttonPreviousIme: ImageButton? = null
     private var buttonSettings: ImageButton? = null
     private var micRippleContainer: ConstraintLayout? = null
@@ -70,7 +70,7 @@ class WhisperKeyboard {
         buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
-        buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as ImageButton
+        buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as BackspaceButton
         buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
         buttonSettings = keyboardView!!.findViewById(R.id.btn_settings) as ImageButton
         micRippleContainer = keyboardView!!.findViewById(R.id.mic_ripples) as ConstraintLayout
@@ -90,7 +90,8 @@ class WhisperKeyboard {
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonRecordingDone!!.setOnClickListener { onButtonRecordingDoneClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
-        buttonBackspace!!.setOnClickListener { onButtonBackspaceClick() }
+        buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
+
         if (shouldOfferImeSwitch) {
             buttonPreviousIme!!.setOnClickListener { onButtonPreviousImeClick() }
         }

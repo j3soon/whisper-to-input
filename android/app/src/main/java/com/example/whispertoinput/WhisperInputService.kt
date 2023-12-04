@@ -1,20 +1,14 @@
 package com.example.whispertoinput
 
 import android.inputmethodservice.InputMethodService
-import android.media.MediaRecorder
 import android.os.Build
-import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
-import kotlinx.coroutines.*
-import java.io.IOException
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.IBinder
 import android.text.TextUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.example.whispertoinput.keyboard.WhisperKeyboard
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
