@@ -23,4 +23,5 @@
     <string name="request_style">Request Style</string>
     <string name="backspace_button_hint">Backspace Button</string>
     <string name="btn_previous_ime_hint">Switch To Previous Input Method</string>
+    <string name="generate_logcat">Generate Recent Logcat</string>
 </resources>

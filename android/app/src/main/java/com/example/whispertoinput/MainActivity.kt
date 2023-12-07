@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Environment
 import android.provider.*
 import android.view.View
 import android.widget.Button
@@ -27,6 +28,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
 
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -70,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         val apiKeyInput: EditText = findViewById(R.id.edittext_api_key)
         val btnSetApiKey: Button = findViewById(R.id.btn_set_api_key)
         val requestStyleOption : RadioGroup = findViewById(R.id.radio_request_style)
+        val btnGenLogcat : Button = findViewById(R.id.btn_gen_logcat)
 
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -159,6 +163,27 @@ class MainActivity : AppCompatActivity() {
                 onSetConfig(context, REQUEST_STYLE, (checkedId == R.id.radio_btn_openai_api))
             }
             btnSetApiKey.setOnClickListener { onSetConfig(context, API_KEY, apiKeyInput.text.toString()) }
+            btnGenLogcat.setOnClickListener { generateLogcat() }
+        }
+    }
+
+    private fun generateLogcat() {
+        try {
+            // If path does not exist, create the path first
+            val filepath = File(Environment.getExternalStorageDirectory(), "Documents/WhisperToInput/")
+            if (!filepath.exists()) {
+                filepath.mkdirs()
+            }
+
+            // Create an empty file and use command to write contents into that file
+            val filename = File(Environment.getExternalStorageDirectory(), "Documents/WhisperToInput/log.txt")
+            val cmd = "logcat -r 300 -f " + filename.absolutePath + " ActivityManager:I"
+            filename.createNewFile()
+            Runtime.getRuntime().exec(cmd)
+            Toast.makeText(this, "Generation successful (at ${filename.absolutePath}).", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(this, "Generation failed.", Toast.LENGTH_SHORT).show()
         }
     }
 
