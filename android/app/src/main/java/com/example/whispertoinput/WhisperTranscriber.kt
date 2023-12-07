@@ -1,3 +1,22 @@
+/*
+ * This file is part of Whisper To Input, see <https://github.com/j3soon/whisper-to-input>.
+ *
+ * Copyright (c) 2023 Yan-Bin Diau
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.example.whispertoinput
 
 import android.content.Context
@@ -108,6 +127,10 @@ class WhisperTranscriber {
         apiKey: String,
         isRequestStyleOpenaiApi: Boolean
     ): Request {
+        // Please refer to the following for the endpoint/payload definitions:
+        // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
+        // - https://platform.openai.com/docs/api-reference/audio/createTranscription
+        // - https://platform.openai.com/docs/api-reference/making-requests
         val file: File = File(filename)
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
