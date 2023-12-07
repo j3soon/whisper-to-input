@@ -57,7 +57,8 @@ class WhisperTranscriber {
             if (!response.isSuccessful || response.code / 100 != 2) {
                 throw Exception(response.body!!.string().replace('\n', ' '))
             }
-            return response.body!!.string()
+
+            return response.body!!.string().trim()
         }
 
         // Create a cancellable job in the main thread (for UI updating)
