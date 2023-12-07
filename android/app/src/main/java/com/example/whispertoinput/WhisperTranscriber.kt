@@ -2,6 +2,7 @@ package com.example.whispertoinput
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import com.github.houbb.opencc4j.util.ZhConverterUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -57,8 +58,8 @@ class WhisperTranscriber {
             if (!response.isSuccessful || response.code / 100 != 2) {
                 throw Exception(response.body!!.string().replace('\n', ' '))
             }
-
-            return response.body!!.string().trim()
+            val resultString = response.body!!.string().trim()
+            return ZhConverterUtil.convertToTraditional(resultString)
         }
 
         // Create a cancellable job in the main thread (for UI updating)
