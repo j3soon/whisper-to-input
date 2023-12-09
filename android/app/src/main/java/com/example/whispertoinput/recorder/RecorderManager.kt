@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.example.whispertoinput
+package com.example.whispertoinput.recorder
 
 import android.Manifest
 import android.content.Context
@@ -26,19 +26,17 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.example.whispertoinput.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.io.File
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
-private const val AMPLITUDE_UPDATE_PERIOD: Long = 150
 
-class RecorderManager {
+class RecorderManager(context: Context) {
     companion object {
         fun requiredPermissions() = arrayOf(Manifest.permission.RECORD_AUDIO)
     }
@@ -46,6 +44,14 @@ class RecorderManager {
     private var recorder: MediaRecorder? = null
     private var onUpdateMicrophoneAmplitude: (Int) -> Unit = { }
     private var microhphoneAmplitudeUpdateJob: Job? = null
+    private val amplitudeReportPeriod: Long
+    private val context: Context
+
+    init {
+        this.context = context
+        this.amplitudeReportPeriod =
+            context.resources.getInteger(R.integer.recorder_amplitude_report_period).toLong()
+    }
 
     fun start(context: Context, filename: String) {
         recorder?.apply {
@@ -81,7 +87,7 @@ class RecorderManager {
             while (recorder != null) {
                 val amplitude = recorder?.maxAmplitude ?: 0
                 onUpdateMicrophoneAmplitude(amplitude)
-                delay(AMPLITUDE_UPDATE_PERIOD)
+                delay(amplitudeReportPeriod)
             }
         }
     }

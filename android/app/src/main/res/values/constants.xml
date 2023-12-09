@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Recorder's amplitude report period in milliseconds -->
+    <integer name="recorder_amplitude_report_period">150</integer>
+</resources>
