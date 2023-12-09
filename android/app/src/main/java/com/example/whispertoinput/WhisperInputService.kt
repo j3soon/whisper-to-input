@@ -126,7 +126,7 @@ class WhisperInputService : InputMethodService() {
             // If the fsm indicates finish,
             // simulates a click of the done button to start transcribing
             RecorderStateOutput.FinishRecording -> {
-                whisperKeyboard.invokeRecordingDoneButton()
+                whisperKeyboard.invokeEnterButton()
             }
         }
     }

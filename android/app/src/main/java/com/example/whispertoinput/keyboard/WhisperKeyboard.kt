@@ -63,7 +63,7 @@ class WhisperKeyboard {
     // Views & Keyboard Layout
     private var keyboardView: ConstraintLayout? = null
     private var buttonMic: ImageButton? = null
-    private var buttonRecordingDone: ImageButton? = null
+    private var buttonEnter: ImageButton? = null
     private var labelStatus: TextView? = null
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: BackspaceButton? = null
@@ -86,7 +86,7 @@ class WhisperKeyboard {
         // Inflate the keyboard layout & assign views
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
         buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton
-        buttonRecordingDone = keyboardView!!.findViewById(R.id.btn_recording_done) as ImageButton
+        buttonEnter = keyboardView!!.findViewById(R.id.btn_enter) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as BackspaceButton
@@ -164,8 +164,8 @@ class WhisperKeyboard {
         onButtonMicClick()
     }
 
-    fun invokeRecordingDoneButton() {
-        onButtonRecordingDoneClick()
+    fun invokeEnterButton() {
+        onButtonEnterClick()
     }
 
     private fun onButtonBackspaceClick() {
@@ -206,8 +206,8 @@ class WhisperKeyboard {
         }
     }
 
-    private fun onButtonRecordingDoneClick() {
-        // Upon button recording done click.
+    private fun onButtonEnterClick() {
+        // Upon button enter click.
         // Recording -> Start transcribing
         // else -> nothing
         if (keyboardStatus == KeyboardStatus.Recording) {
@@ -226,7 +226,6 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 waitingIcon!!.visibility = View.INVISIBLE
-                buttonRecordingDone!!.visibility = View.GONE
                 micRippleContainer!!.visibility = View.GONE
             }
 
@@ -234,7 +233,6 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.recording)
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
                 waitingIcon!!.visibility = View.INVISIBLE
-                buttonRecordingDone!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.VISIBLE
             }
 
@@ -242,7 +240,6 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.transcribing)
                 buttonMic!!.setImageResource(R.drawable.mic_transcribing)
                 waitingIcon!!.visibility = View.VISIBLE
-                buttonRecordingDone!!.visibility = View.GONE
                 micRippleContainer!!.visibility = View.GONE
             }
         }
