@@ -51,11 +51,12 @@ class WhisperKeyboard {
     // Keyboard event listeners. Assignable custom behaviors upon certain UI events (user-operated).
     private var onStartRecording: () -> Unit = { }
     private var onCancelRecording: () -> Unit = { }
-    private var onStartTranscribing: () -> Unit = { }
+    private var onStartTranscribing: (includeNewline: Boolean) -> Unit = { }
     private var onCancelTranscribing: () -> Unit = { }
     private var onButtonBackspace: () -> Unit = { }
     private var onSwitchIme: () -> Unit = { }
     private var onOpenSettings: () -> Unit = { }
+    private var onEnter: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -77,9 +78,10 @@ class WhisperKeyboard {
         shouldOfferImeSwitch: Boolean,
         onStartRecording: () -> Unit,
         onCancelRecording: () -> Unit,
-        onStartTranscribing: () -> Unit,
+        onStartTranscribing: (includeNewline: Boolean) -> Unit,
         onCancelTranscribing: () -> Unit,
         onButtonBackspace: () -> Unit,
+        onEnter: () -> Unit,
         onSwitchIme: () -> Unit,
         onOpenSettings: () -> Unit
     ): View {
@@ -107,7 +109,7 @@ class WhisperKeyboard {
 
         // Set onClick listeners
         buttonMic!!.setOnClickListener { onButtonMicClick() }
-        buttonRecordingDone!!.setOnClickListener { onButtonRecordingDoneClick() }
+        buttonEnter!!.setOnClickListener { onButtonEnterClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
 
@@ -123,6 +125,7 @@ class WhisperKeyboard {
         this.onButtonBackspace = onButtonBackspace
         this.onSwitchIme = onSwitchIme
         this.onOpenSettings = onOpenSettings
+        this.onEnter = onEnter
 
         // Resets keyboard upon setup
         reset()
@@ -147,7 +150,8 @@ class WhisperKeyboard {
         )
 
         // decibel-like calculation
-        val normalizedPower = (log10(clampedAmplitude * 1f) - LOG_10_10) / (LOG_10_25000 - LOG_10_10)
+        val normalizedPower =
+            (log10(clampedAmplitude * 1f) - LOG_10_10) / (LOG_10_25000 - LOG_10_10)
 
         // normalizedPower ranges from 0 to 1.
         // The inner-most ripple should be the most sensitive to audio,
@@ -155,17 +159,30 @@ class WhisperKeyboard {
         for (micRippleIdx in micRipples.indices) {
             micRipples[micRippleIdx].clearAnimation()
             micRipples[micRippleIdx].alpha = normalizedPower.pow(amplitudePowers[micRippleIdx])
-            micRipples[micRippleIdx].animate().alpha(0f).setDuration(AMPLITUDE_ANIMATION_DURATION).start()
+            micRipples[micRippleIdx].animate().alpha(0f).setDuration(AMPLITUDE_ANIMATION_DURATION)
+                .start()
         }
     }
 
-    // Simulate a click on mic button
-    fun invokeMicButton() {
-        onButtonMicClick()
+    fun tryStartRecording() {
+        if (keyboardStatus == KeyboardStatus.Idle) {
+            setKeyboardStatus(KeyboardStatus.Recording)
+            onStartRecording()
+        }
     }
 
-    fun invokeEnterButton() {
-        onButtonEnterClick()
+    fun tryCancelRecording() {
+        if (keyboardStatus == KeyboardStatus.Recording) {
+            setKeyboardStatus(KeyboardStatus.Idle)
+            onCancelRecording()
+        }
+    }
+
+    fun tryStartTranscribing(includeNewline: Boolean) {
+        if (keyboardStatus == KeyboardStatus.Recording) {
+            setKeyboardStatus(KeyboardStatus.Waiting)
+            onStartTranscribing(includeNewline)
+        }
     }
 
     private fun onButtonBackspaceClick() {
@@ -208,11 +225,13 @@ class WhisperKeyboard {
 
     private fun onButtonEnterClick() {
         // Upon button enter click.
-        // Recording -> Start transcribing
-        // else -> nothing
+        // Recording -> Start transcribing (with a newline included)
+        // else -> invokes onEnter
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Waiting)
-            onStartTranscribing()
+            onStartTranscribing(true)
+        } else {
+            onEnter()
         }
     }
 
