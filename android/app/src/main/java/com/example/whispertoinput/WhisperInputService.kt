@@ -28,6 +28,7 @@ import android.text.TextUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.whispertoinput.keyboard.WhisperKeyboard
+import com.example.whispertoinput.recorder.RecorderManager
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 import com.github.liuyueyi.quick.transfer.constants.TransType
 
@@ -38,7 +39,7 @@ private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
 class WhisperInputService : InputMethodService() {
     private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
-    private var recorderManager: RecorderManager = RecorderManager()
+    private var recorderManager: RecorderManager = RecorderManager(this)
     private var recordedAudioFilename: String = ""
     private var isFirstTime: Boolean = true
 
