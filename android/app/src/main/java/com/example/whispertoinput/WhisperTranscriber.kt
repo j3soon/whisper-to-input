@@ -79,7 +79,7 @@ class WhisperTranscriber {
             }
 
             return if (includeNewline) {
-                response.body!!.string().trim() + "\n"
+                response.body!!.string().trim() + "\r\n"
             } else {
                 response.body!!.string().trim()
             }
