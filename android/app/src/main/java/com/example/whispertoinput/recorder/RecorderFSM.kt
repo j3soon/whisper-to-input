@@ -99,9 +99,8 @@ class RecorderFSM(context: Context) {
             State.Idle -> {
                 pushNewReport(amplitude, windowLengthIdle)
                 if (amplitude > thresholdIdleToSpeaking) {
+                    reset()
                     state = State.Speaking
-                    dataWindow = ArrayDeque()
-                    numReportsThisState = 0
                     return RecorderStateOutput.Normal
                 }
 
@@ -124,6 +123,7 @@ class RecorderFSM(context: Context) {
     fun reset() {
         state = State.Idle
         dataWindow = ArrayDeque()
+        decreasingDeque = ArrayDeque()
         numReportsThisState = 0
     }
 
