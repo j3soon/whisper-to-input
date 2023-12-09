@@ -43,7 +43,7 @@ class RecorderManager(context: Context) {
 
     private var recorder: MediaRecorder? = null
     private var onUpdateMicrophoneAmplitude: (Int) -> Unit = { }
-    private var microhphoneAmplitudeUpdateJob: Job? = null
+    private var microphoneAmplitudeUpdateJob: Job? = null
     private val amplitudeReportPeriod: Long
     private val context: Context
 
@@ -82,8 +82,8 @@ class RecorderManager(context: Context) {
         }
 
         // Start a job to periodically report current amplitude
-        microhphoneAmplitudeUpdateJob?.cancel()
-        microhphoneAmplitudeUpdateJob = CoroutineScope(Dispatchers.Main).launch {
+        microphoneAmplitudeUpdateJob?.cancel()
+        microphoneAmplitudeUpdateJob = CoroutineScope(Dispatchers.Main).launch {
             while (recorder != null) {
                 val amplitude = recorder?.maxAmplitude ?: 0
                 onUpdateMicrophoneAmplitude(amplitude)
@@ -99,8 +99,8 @@ class RecorderManager(context: Context) {
         }
         recorder = null
 
-        microhphoneAmplitudeUpdateJob?.cancel()
-        microhphoneAmplitudeUpdateJob = null
+        microphoneAmplitudeUpdateJob?.cancel()
+        microphoneAmplitudeUpdateJob = null
     }
 
     // Assign onUpdateMicrophoneAmplitude callback
