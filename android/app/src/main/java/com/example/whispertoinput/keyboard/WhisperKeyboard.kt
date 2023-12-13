@@ -207,7 +207,7 @@ class WhisperKeyboard {
         // Upon button mic click...
         // Idle -> Start Recording
         // Recording -> Finish Recording (without a newline)
-        // Waiting -> Cancel Transcribing
+        // Waiting -> Nothing (to avoid double-clicking by mistake, which starts transcribing and then immediately cancels it)
         when (keyboardStatus) {
             KeyboardStatus.Idle -> {
                 setKeyboardStatus(KeyboardStatus.Recording)
@@ -220,8 +220,7 @@ class WhisperKeyboard {
             }
 
             KeyboardStatus.Waiting -> {
-                setKeyboardStatus(KeyboardStatus.Idle)
-                onCancelTranscribing()
+                return
             }
         }
     }
