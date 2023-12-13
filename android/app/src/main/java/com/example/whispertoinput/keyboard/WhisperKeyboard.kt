@@ -65,6 +65,7 @@ class WhisperKeyboard {
     private var keyboardView: ConstraintLayout? = null
     private var buttonMic: ImageButton? = null
     private var buttonEnter: ImageButton? = null
+    private var buttonCancel: ImageButton? = null
     private var labelStatus: TextView? = null
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: BackspaceButton? = null
@@ -89,6 +90,7 @@ class WhisperKeyboard {
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
         buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton
         buttonEnter = keyboardView!!.findViewById(R.id.btn_enter) as ImageButton
+        buttonCancel = keyboardView!!.findViewById(R.id.btn_cancel) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as BackspaceButton
@@ -110,6 +112,7 @@ class WhisperKeyboard {
         // Set onClick listeners
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonEnter!!.setOnClickListener { onButtonEnterClick() }
+        buttonCancel!!.setOnClickListener { onButtonCancelClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
 
@@ -203,7 +206,7 @@ class WhisperKeyboard {
     private fun onButtonMicClick() {
         // Upon button mic click...
         // Idle -> Start Recording
-        // Recording -> Cancel Recording
+        // Recording -> Finish Recording (without a newline)
         // Waiting -> Cancel Transcribing
         when (keyboardStatus) {
             KeyboardStatus.Idle -> {
@@ -212,8 +215,8 @@ class WhisperKeyboard {
             }
 
             KeyboardStatus.Recording -> {
-                setKeyboardStatus(KeyboardStatus.Idle)
-                onCancelRecording()
+                setKeyboardStatus(KeyboardStatus.Waiting)
+                onStartTranscribing(false)
             }
 
             KeyboardStatus.Waiting -> {
@@ -235,6 +238,20 @@ class WhisperKeyboard {
         }
     }
 
+    private fun onButtonCancelClick() {
+        // Upon button cancel click.
+        // Recording -> Cancel
+        // Waiting -> Cancel
+        // else -> nothing
+        if (keyboardStatus == KeyboardStatus.Recording) {
+            setKeyboardStatus(KeyboardStatus.Idle)
+            onCancelRecording()
+        } else if (keyboardStatus == KeyboardStatus.Waiting) {
+            setKeyboardStatus(KeyboardStatus.Idle)
+            onCancelTranscribing()
+        }
+    }
+
     private fun setKeyboardStatus(newStatus: KeyboardStatus) {
         if (keyboardStatus == newStatus) {
             return
@@ -245,6 +262,7 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 waitingIcon!!.visibility = View.INVISIBLE
+                buttonCancel!!.visibility = View.INVISIBLE
                 micRippleContainer!!.visibility = View.GONE
             }
 
@@ -252,6 +270,7 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.recording)
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
                 waitingIcon!!.visibility = View.INVISIBLE
+                buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.VISIBLE
             }
 
@@ -259,6 +278,7 @@ class WhisperKeyboard {
                 labelStatus!!.setText(R.string.transcribing)
                 buttonMic!!.setImageResource(R.drawable.mic_transcribing)
                 waitingIcon!!.visibility = View.VISIBLE
+                buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.GONE
             }
         }
