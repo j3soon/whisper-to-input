@@ -4,18 +4,18 @@
     <integer name="recorder_amplitude_report_period">150</integer>
 
     <!-- The threshold amplitude over which the Recorder FSM turns into Speaking from Idle -->
-    <integer name="recorder_fsm_idle_speaking_threshold">2300</integer>
+    <integer name="recorder_fsm_idle_speaking_threshold">800</integer>
     <!-- The threshold amplitude under which the Recorder FSM
          cancels recording during Idle (for recorder_fsm_idle_cancel_time ms) -->
-    <integer name="recorder_fsm_idle_cancel_threshold">2300</integer>
+    <integer name="recorder_fsm_idle_cancel_threshold">800</integer>
     <!-- The time (ms) over which if the user stays silent (<= recorder_fsm_idle_cancel_threshold)
          in Recorder FSM Idle, recording is automatically cancelled.  -->
-    <integer name="recorder_fsm_idle_cancel_time">2000</integer>
+    <integer name="recorder_fsm_idle_cancel_time">5000</integer>
 
     <!-- The threshold amplitude under which the Recorder FSM finishes recording
          during Speaking (for recorder_fsm_speaking_finish_time ms)  -->
-    <integer name="recorder_fsm_speaking_finish_threshold">2300</integer>
+    <integer name="recorder_fsm_speaking_finish_threshold">800</integer>
     <!-- The time (ms) over which if the user stays silent (<= recorder_fsm_speaking_finish_threshold)
          in Recorder FSM Speaking, recording is automatically finished. -->
-    <integer name="recorder_fsm_speaking_finish_time">1000</integer>
+    <integer name="recorder_fsm_speaking_finish_time">3000</integer>
 </resources>
