@@ -24,4 +24,6 @@
     <string name="backspace_button_hint">Backspace Button</string>
     <string name="btn_previous_ime_hint">Switch To Previous Input Method</string>
     <string name="generate_logcat">Generate Recent Logcat</string>
+    <string name="whisper_to_input_settings_title">Whisper To Input Settings</string>
+    <string name="btn_apply">Apply</string>
 </resources>

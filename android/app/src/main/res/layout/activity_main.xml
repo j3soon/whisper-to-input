@@ -27,213 +27,61 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_light_yellow"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/settings_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:text="@string/whisper_to_input_settings_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_settings_apply"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_settings_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:text="@string/btn_apply"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:padding="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_top_bar">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
+            android:id="@+id/settings_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/label_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="@string/whisper_to_input"
-                android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/label_microphone"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="@string/microphone"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_mic_permission"
-                app:layout_constraintEnd_toStartOf="@+id/btn_mic_permission"
-                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
-                app:layout_constraintTop_toTopOf="@+id/btn_mic_permission" />
-
-            <Button
-                android:id="@+id/btn_mic_permission"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:onClick="onRequestMicrophonePermission"
-                android:text="@string/grant_microphone_permission"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
-                app:layout_constraintTop_toBottomOf="@+id/edittext_language_code" />
-
-            <TextView
-                android:id="@+id/label_endpoint"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:gravity="center_vertical"
-                android:text="@string/endpoint"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_endpoint"
-                app:layout_constraintEnd_toStartOf="@+id/edittext_endpoint"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/edittext_endpoint" />
-
-            <EditText
-                android:id="@+id/edittext_endpoint"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginEnd="16dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="@string/endpoint_hint"
-                android:inputType="textMultiLine"
-                android:minHeight="48dp"
-                app:layout_constraintEnd_toStartOf="@+id/btn_set_endpoint"
-                app:layout_constraintStart_toEndOf="@+id/label_endpoint"
-                app:layout_constraintTop_toBottomOf="@+id/label_title" />
-
-            <Button
-                android:id="@+id/btn_set_endpoint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
-                android:text="@string/set"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_endpoint"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/edittext_endpoint"
-                app:layout_constraintTop_toTopOf="@+id/edittext_endpoint" />
-
-            <TextView
-                android:id="@+id/label_language_code"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center_vertical"
-                android:text="@string/language_code"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_language_code"
-                app:layout_constraintEnd_toStartOf="@+id/edittext_language_code"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
-                app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
-
-            <EditText
-                android:id="@+id/edittext_language_code"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="@string/language_code_hint"
-                android:inputType="textMultiLine"
-                android:minHeight="48dp"
-                app:layout_constraintEnd_toStartOf="@+id/btn_set_language_code"
-                app:layout_constraintStart_toEndOf="@+id/label_language_code"
-                app:layout_constraintTop_toBottomOf="@+id/edittext_endpoint" />
-
-            <Button
-                android:id="@+id/btn_set_language_code"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_language_code"
-                app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
-                app:layout_constraintStart_toEndOf="@+id/edittext_language_code"
-                app:layout_constraintTop_toTopOf="@+id/edittext_language_code" />
-
-
-            <TextView
-                android:id="@+id/label_request_style"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center_vertical"
-                android:text="@string/request_style"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/radio_request_style"
-                app:layout_constraintEnd_toStartOf="@+id/radio_request_style"
-                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
-                app:layout_constraintTop_toTopOf="@+id/radio_request_style" />
-
-            <RadioGroup
-                android:id="@+id/radio_request_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="@+id/btn_set_language_code"
-                app:layout_constraintTop_toBottomOf="@+id/edittext_language_code">
-
-                <RadioButton
-                    android:id="@+id/radio_btn_openai_api"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/option_openai_api" />
-
-                <RadioButton
-                    android:id="@+id/radio_btn_whisper_webservice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/option_whisper_webservice" />
-            </RadioGroup>
-
-            <TextView
-                android:id="@+id/label_api_key"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:gravity="center_vertical"
-                android:text="@string/api_key"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
-                app:layout_constraintEnd_toStartOf="@+id/edittext_api_key"
-                app:layout_constraintStart_toStartOf="@+id/label_endpoint"
-                app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
-
-            <EditText
-                android:id="@+id/edittext_api_key"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="@string/api_key_hint"
-                android:inputType="textMultiLine"
-                android:minHeight="48dp"
-                app:layout_constraintEnd_toStartOf="@+id/btn_set_language_code"
-                app:layout_constraintStart_toEndOf="@+id/label_api_key"
-                app:layout_constraintTop_toBottomOf="@id/radio_request_style" />
-
-            <Button
-                android:id="@+id/btn_set_api_key"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set"
-                app:layout_constraintBottom_toBottomOf="@+id/edittext_api_key"
-                app:layout_constraintEnd_toEndOf="@+id/btn_set_endpoint"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/edittext_api_key"
-                app:layout_constraintTop_toTopOf="@+id/edittext_api_key" />
-
-            <Button
-                android:id="@+id/btn_gen_logcat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="64dp"
-                android:text="@string/generate_logcat"
-                app:layout_constraintEnd_toEndOf="@+id/btn_set_api_key"
-                app:layout_constraintStart_toStartOf="@+id/label_api_key"
-                app:layout_constraintTop_toBottomOf="@+id/btn_set_api_key" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:orientation="vertical"/>
     </ScrollView>
 
 
