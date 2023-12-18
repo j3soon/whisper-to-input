@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+    <setting
+        label="@string/request_style"
+        type="dropdown"
+        dataStoreType="bool"
+        dataStoreKey="is-openai-api-request-style"
+        default="0">
+        <item
+            id="0"
+            label="@string/option_openai_api"
+            value="true"/>
+        <item
+            id="1"
+            label="@string/option_whisper_webservice"
+            value="false"/>
+    </setting>
+    <setting
+        label="@string/endpoint"
+        type="text"
+        dataStoreType="string"
+        dataStoreKey="endpoint"
+        hint="@string/endpoint_hint"/>
+    <setting
+        label="@string/language_code"
+        type="text"
+        dataStoreType="string"
+        dataStoreKey="language-code"
+        hint="@string/language_code_hint"/>
+    <setting
+        label="@string/api_key"
+        type="text"
+        dataStoreType="string"
+        dataStoreKey="api-key"
+        hint="@string/api_key_hint"/>
+</Settings>
