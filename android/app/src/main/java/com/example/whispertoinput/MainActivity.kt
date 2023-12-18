@@ -32,6 +32,7 @@ import android.provider.*
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -42,6 +43,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.whispertoinput.recorder.RecorderManager
+import com.example.whispertoinput.settings.SettingsPageBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -62,10 +64,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setupConfigWidgets(this)
-        checkPermissions()
+        val settingsList: LinearLayout = findViewById(R.id.settings_list)
+        SettingsPageBuilder().build(this, layoutInflater, settingsList, R.xml.settings)
+        //setupConfigWidgets(this)
+        //checkPermissions()
     }
-
+/*
     // The onClick event of the grant permission button.
     // Opens up the app settings panel to manually configure permissions.
     fun onRequestMicrophonePermission(view: View) {
@@ -263,5 +267,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+*/
 }

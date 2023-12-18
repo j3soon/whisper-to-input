@@ -80,8 +80,9 @@
             android:id="@+id/settings_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="32dp"
             android:minHeight="100dp"
-            android:orientation="vertical"/>
+            android:orientation="vertical" />
     </ScrollView>
 
 
