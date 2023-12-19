@@ -65,7 +65,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val settingsList: LinearLayout = findViewById(R.id.settings_list)
-        SettingsPageBuilder().build(this, layoutInflater, settingsList, R.xml.settings)
+        val builder = SettingsPageBuilder(this, layoutInflater, settingsList, R.xml.settings)
+        builder.build()
         //setupConfigWidgets(this)
         //checkPermissions()
     }
