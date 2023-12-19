@@ -26,4 +26,5 @@
     <string name="generate_logcat">Generate Recent Logcat</string>
     <string name="whisper_to_input_settings_title">Whisper To Input Settings</string>
     <string name="btn_apply">Apply</string>
+    <string name="empty_string" />
 </resources>
