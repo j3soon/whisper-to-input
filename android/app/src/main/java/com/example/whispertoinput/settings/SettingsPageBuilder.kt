@@ -38,9 +38,7 @@ class SettingsPageBuilder(
                 event = when (tagType) {
                     "text" -> buildText(parser)
                     "dropdown" -> buildDropdown(parser)
-                    else -> {
-                        throw Exception("Unknown tag type")
-                    }
+                    else -> throw Exception("Unknown tag type")
                 }
             } else {
                 event = parser.next()

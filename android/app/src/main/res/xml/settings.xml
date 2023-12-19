@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
     <setting
-        label="@string/request_style"
+        label="@string/settings_request_style"
+        desc="@string/settings_request_style_desc"
         type="dropdown"
         dataStoreType="bool"
         dataStoreKey="is-openai-api-request-style"
         default="0">
         <item
             id="0"
-            label="@string/option_openai_api"
+            label="@string/settings_option_openai_api"
             value="true"/>
         <item
             id="1"
-            label="@string/option_whisper_webservice"
+            label="@string/settings_option_whisper_webservice"
             value="false"/>
     </setting>
     <setting
-        label="@string/endpoint"
+        label="@string/settings_endpoint"
+        desc="@string/settings_endpoint_desc"
         type="text"
         dataStoreType="string"
         dataStoreKey="endpoint"
-        hint="@string/endpoint_hint"/>
+        hint="@string/settings_endpoint_hint"/>
     <setting
-        label="@string/language_code"
+        label="@string/settings_language_code"
+        desc="@string/settings_language_code_desc"
         type="text"
         dataStoreType="string"
         dataStoreKey="language-code"
-        hint="@string/language_code_hint"/>
+        hint="@string/settings_language_code_hint"/>
     <setting
-        label="@string/api_key"
+        label="@string/settings_api_key"
+        desc="@string/settings_api_key_desc"
         type="text"
         dataStoreType="string"
         dataStoreKey="api-key"
-        hint="@string/api_key_hint"/>
+        hint="@string/settings_api_key_hint"/>
 </Settings>
