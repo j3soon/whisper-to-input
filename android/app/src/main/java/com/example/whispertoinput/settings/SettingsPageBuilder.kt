@@ -5,14 +5,18 @@ import android.content.res.XmlResourceParser
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.whispertoinput.R
 
 
 class SettingsPageBuilder(
     private val context: Context,
+    private val btnApply: Button,
     private val layoutInflater: LayoutInflater,
     private val settingsList: LinearLayout,
     private val settingsResId: Int
@@ -21,6 +25,7 @@ class SettingsPageBuilder(
     fun build() {
         // Initialize an XmlResourceParser from a resource id
         val parser: XmlResourceParser = context.resources.getXml(settingsResId)
+        val settingsPage: SettingsPage = SettingsPage()
 
         var tag: String? = null
         var tagType: String? = null
@@ -33,7 +38,7 @@ class SettingsPageBuilder(
             // Parse tag starts
             if (event == XmlResourceParser.START_TAG && tag == "setting" && !tagType.isNullOrEmpty()) {
                 event = when (tagType) {
-                    "text" -> buildText(parser)
+                    "text" -> buildText(parser, settingsPage)
                     "dropdown" -> buildDropdown(parser)
                     else -> throw Exception("Unknown tag type")
                 }
@@ -41,14 +46,21 @@ class SettingsPageBuilder(
                 event = parser.next()
             }
         }
+
+        settingsPage.setup(context, btnApply)
     }
 
-    // Inflate and set up a text setting field.
-    private fun buildText(parser: XmlResourceParser): Int {
-        val textSetting: View = layoutInflater.inflate(R.layout.settings_text, settingsList, false)
-        textSetting.findViewById<TextView>(R.id.label).text = attrToString(parser, "label")
-        textSetting.findViewById<TextView>(R.id.description).text = attrToString(parser, "desc")
-        settingsList.addView(textSetting)
+    // Inflate and initialize a text setting field.
+    private fun buildText(parser: XmlResourceParser, settingsPage: SettingsPage): Int {
+        val view: View = layoutInflater.inflate(R.layout.settings_text, settingsList, false)
+        val label: String = attrToString(parser, "label")
+        val desc: String = attrToString(parser, "desc")
+        val hint: String = attrToString(parser, "hint")
+        val preferenceKey: Preferences.Key<String> = stringPreferencesKey(attrToString(parser, "dataStoreKey"))
+        val settingText = SettingText(btnApply, view, label, desc, hint, preferenceKey)
+
+        settingsPage.add(settingText)
+        settingsList.addView(view)
 
         return parser.next()
     }
