@@ -2,17 +2,14 @@ package com.example.whispertoinput.settings
 
 import android.content.Context
 import android.content.res.XmlResourceParser
-import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginBottom
 import com.example.whispertoinput.R
+
 
 class SettingsPageBuilder(
     private val context: Context,
@@ -63,6 +60,23 @@ class SettingsPageBuilder(
         dropdownSetting.findViewById<TextView>(R.id.label).text = attrToString(parser, "label")
         dropdownSetting.findViewById<TextView>(R.id.description).text = attrToString(parser, "desc")
         settingsList.addView(dropdownSetting)
+
+        // Process dropdown options
+        val spinner = dropdownSetting.findViewById<Spinner>(R.id.spinner)
+
+        val spinnerArray = ArrayList<String>()
+        spinnerArray.add("one")
+        spinnerArray.add("two")
+        spinnerArray.add("three")
+        spinnerArray.add("four")
+        spinnerArray.add("five")
+
+        val spinnerArrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
+        spinner.adapter = spinnerArrayAdapter
+        spinner.setSelection(2)
+
+        // TODO: Complete all callbacks and events here
 
         return parser.next()
     }
