@@ -47,6 +47,7 @@ class WhisperTranscriber {
         context: Context,
         filename: String,
         mediaType: String,
+        includeNewline: Boolean,
         callback: (String?) -> Unit,
         exceptionCallback: (String) -> Unit
     ) {
@@ -77,7 +78,11 @@ class WhisperTranscriber {
                 throw Exception(response.body!!.string().replace('\n', ' '))
             }
 
-            return response.body!!.string().trim()
+            return if (includeNewline) {
+                response.body!!.string().trim() + "\r\n"
+            } else {
+                response.body!!.string().trim()
+            }
         }
 
         // Create a cancellable job in the main thread (for UI updating)

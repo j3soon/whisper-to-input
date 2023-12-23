@@ -25,9 +25,14 @@ import android.view.View
 import android.content.Intent
 import android.os.IBinder
 import android.text.TextUtils
+import android.util.Log
+import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.whispertoinput.keyboard.WhisperKeyboard
+import com.example.whispertoinput.recorder.RecorderFSM
+import com.example.whispertoinput.recorder.RecorderManager
+import com.example.whispertoinput.recorder.RecorderStateOutput
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 import com.github.liuyueyi.quick.transfer.constants.TransType
 
@@ -36,9 +41,10 @@ private const val AUDIO_MEDIA_TYPE = "audio/mp4"
 private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
 
 class WhisperInputService : InputMethodService() {
-    private var whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
-    private var whisperJobManager: WhisperTranscriber = WhisperTranscriber()
-    private var recorderManager: RecorderManager = RecorderManager()
+    private val whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
+    private val whisperJobManager: WhisperTranscriber = WhisperTranscriber()
+    private var recorderManager: RecorderManager? = null
+    private var recorderFsm: RecorderFSM? = null
     private var recordedAudioFilename: String = ""
     private var isFirstTime: Boolean = true
 
@@ -54,6 +60,10 @@ class WhisperInputService : InputMethodService() {
     }
 
     override fun onCreateInputView(): View {
+        // Initialize members with regard to this context
+        recorderManager = RecorderManager(this)
+        recorderFsm = RecorderFSM(this)
+
         // Preload conversion table
         ChineseUtils.preLoad(true, TransType.SIMPLE_TO_TAIWAN)
 
@@ -72,52 +82,68 @@ class WhisperInputService : InputMethodService() {
             }
 
         // Sets up recorder manager
-        recorderManager.setOnUpdateMicrophoneAmplitude { amplitude ->
+        recorderManager!!.setOnUpdateMicrophoneAmplitude { amplitude ->
             onUpdateMicrophoneAmplitude(amplitude)
         }
 
         // Returns the keyboard after setting it up and inflating its layout
-        return whisperKeyboard.setup(
-            layoutInflater,
+        return whisperKeyboard.setup(layoutInflater,
             shouldOfferImeSwitch,
             { onStartRecording() },
             { onCancelRecording() },
-            { onStartTranscription() },
+            { includeNewline -> onStartTranscription(includeNewline) },
             { onCancelTranscription() },
             { onDeleteText() },
+            { onEnter() },
             { onSwitchIme() },
             { onOpenSettings() })
     }
 
     private fun onStartRecording() {
         // Upon starting recording, check whether audio permission is granted.
-        if (!recorderManager.allPermissionsGranted(this)) {
+        if (!recorderManager!!.allPermissionsGranted(this)) {
             // If not, launch app MainActivity (for permission setup).
             launchMainActivity()
             whisperKeyboard.reset()
             return
         }
 
-        recorderManager.start(this, recordedAudioFilename)
+        recorderManager!!.start(this, recordedAudioFilename)
+        recorderFsm!!.reset()
     }
 
     private fun onUpdateMicrophoneAmplitude(amplitude: Int) {
-        whisperKeyboard.updateMicrophoneAmplitude(amplitude)
+        // Reports amplitude to fsm.
+        when (recorderFsm!!.reportAmplitude(amplitude)) {
+            // Normally, just update keyboard visuals
+            RecorderStateOutput.Normal -> {
+                whisperKeyboard.updateMicrophoneAmplitude(amplitude)
+            }
+            // If the fsm indicates cancellation,
+            // simulates a click of the mic button to cancel recording
+            RecorderStateOutput.CancelRecording -> {
+                whisperKeyboard.tryCancelRecording()
+            }
+            // If the fsm indicates finish,
+            // simulates a click of the done button to start transcribing
+            RecorderStateOutput.FinishRecording -> {
+                whisperKeyboard.tryStartTranscribing(false)
+            }
+        }
     }
 
     private fun onCancelRecording() {
-        recorderManager.stop()
+        recorderManager!!.stop()
     }
 
-    private fun onStartTranscription() {
-        recorderManager.stop()
-        whisperJobManager.startAsync(
-            this,
+    private fun onStartTranscription(includeNewline: Boolean) {
+        recorderManager!!.stop()
+        whisperJobManager.startAsync(this,
             recordedAudioFilename,
             AUDIO_MEDIA_TYPE,
+            includeNewline,
             { transcriptionCallback(it) },
-            { transcriptionExceptionCallback(it) }
-        )
+            { transcriptionExceptionCallback(it) })
     }
 
     private fun onCancelTranscription() {
@@ -152,6 +178,11 @@ class WhisperInputService : InputMethodService() {
         launchMainActivity()
     }
 
+    private fun onEnter() {
+        val inputConnection = currentInputConnection ?: return
+        inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+    }
+
     // Opens up app MainActivity
     private fun launchMainActivity() {
         val dialogIntent = Intent(this, MainActivity::class.java)
@@ -163,13 +194,13 @@ class WhisperInputService : InputMethodService() {
         super.onWindowShown()
         whisperJobManager.stop()
         whisperKeyboard.reset()
-        recorderManager.stop()
+        recorderManager!!.stop()
 
         // If this is the first time calling onWindowShown, it means this IME is just being switched to
         // Automatically starts recording after switching to Whisper Input
         if (isFirstTime) {
             isFirstTime = false
-            whisperKeyboard.invokeMicButton()
+            whisperKeyboard.tryStartRecording()
         }
     }
 
@@ -177,7 +208,7 @@ class WhisperInputService : InputMethodService() {
         super.onWindowHidden()
         whisperJobManager.stop()
         whisperKeyboard.reset()
-        recorderManager.stop()
+        recorderManager!!.stop()
     }
 
 }
