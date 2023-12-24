@@ -2,25 +2,25 @@ package com.example.whispertoinput.settings
 
 import android.content.Context
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.example.whispertoinput.R
-import com.example.whispertoinput.REQUEST_STYLE
 import com.example.whispertoinput.dataStore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class SettingItem(private val btnApply: Button) {
     private var isDirty: Boolean = false
+    private var ignoringDirtiness: Boolean = false
 
     // Should be used in a CoroutineScope
     abstract suspend fun apply(context: Context)
@@ -33,8 +33,19 @@ abstract class SettingItem(private val btnApply: Button) {
     }
 
     protected fun setIsDirty() {
+        if (ignoringDirtiness) {
+            return
+        }
         isDirty = true
         btnApply.isEnabled = true
+    }
+
+    fun resetIsDirty() {
+        isDirty = false
+    }
+
+    protected fun setIgnoringDirtiness(ignoringDirtiness: Boolean) {
+        this.ignoringDirtiness = ignoringDirtiness
     }
 
     protected suspend fun <T> writeSetting(context: Context, key: Preferences.Key<T>, newValue: T) {
@@ -64,6 +75,9 @@ class SettingText(
 ) : SettingItem(btnApply) {
 
     override suspend fun setup(context: Context) {
+        // Ignore dirtiness until fully set up
+        setIgnoringDirtiness(true)
+
         // Assign components
         view.findViewById<TextView>(R.id.label).text = label
         view.findViewById<TextView>(R.id.description).text = desc
@@ -82,6 +96,7 @@ class SettingText(
         val value: String? = readSetting(context, preferenceKey)
         if (!value.isNullOrEmpty()) {
             textField.setText(value)
+            setIgnoringDirtiness(false)
         }
         textField.isEnabled = true
     }
@@ -92,4 +107,73 @@ class SettingText(
         val newValue: String = view.findViewById<EditText>(R.id.field).text.toString()
         writeSetting(context, preferenceKey, newValue)
     }
+}
+
+class SettingDropdown<T>(
+    btnApply: Button,
+    private val view: View,
+    private val label: String,
+    private val desc: String,
+    private val options: ArrayList<Option<T>>,
+    private val preferenceKey: Preferences.Key<T>
+) : SettingItem(btnApply), AdapterView.OnItemSelectedListener {
+
+    class Option<T>(private val label: String, private val value: T) {
+        fun getLabel() = label
+        fun getValue() = value
+    }
+
+    private val valueToIdx: HashMap<T, Int> = HashMap<T, Int>()
+
+    override suspend fun setup(context: Context) {
+        // Ignore dirtiness until fully set up
+        setIgnoringDirtiness(true)
+
+        // Assign components
+        view.findViewById<TextView>(R.id.label).text = label
+        view.findViewById<TextView>(R.id.description).text = desc
+
+        // Build value to index
+        options.forEachIndexed { index, option ->
+            valueToIdx[option.getValue()] = index
+        }
+
+        // Configure spinner & assign onEdit callback
+        val spinner = view.findViewById<Spinner>(R.id.spinner)
+
+        // Add options
+        val spinnerArray = ArrayList<String>()
+        options.forEach { option ->
+            spinnerArray.add(option.getLabel())
+        }
+
+        val spinnerArrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
+        spinner.adapter = spinnerArrayAdapter
+
+        spinner.isEnabled = false
+        spinner.onItemSelectedListener = this
+
+        // Read data
+        val value: T? = readSetting(context, preferenceKey)
+        if (value != null) {
+            spinner.setSelection(valueToIdx[value]!!)
+            setIgnoringDirtiness(false)
+        }
+        spinner.isEnabled = true
+    }
+
+    override suspend fun apply(context: Context) {
+        if (!getIsDirty()) return
+
+        val selectedOption = options[view.findViewById<Spinner>(R.id.spinner).selectedItemPosition]
+        val newValue: T = selectedOption.getValue()
+        writeSetting(context, preferenceKey, newValue)
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        setIsDirty()
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) { }
 }

@@ -8,11 +8,9 @@
         dataStoreKey="is-openai-api-request-style"
         default="0">
         <item
-            id="0"
             label="@string/settings_option_openai_api"
             value="true"/>
         <item
-            id="1"
             label="@string/settings_option_whisper_webservice"
             value="false"/>
     </setting>

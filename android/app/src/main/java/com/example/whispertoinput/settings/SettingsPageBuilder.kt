@@ -8,8 +8,8 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.TextView
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.whispertoinput.R
 
@@ -22,10 +22,10 @@ class SettingsPageBuilder(
     private val settingsResId: Int
 ) {
 
-    fun build() {
+    fun build() : SettingsPage {
         // Initialize an XmlResourceParser from a resource id
         val parser: XmlResourceParser = context.resources.getXml(settingsResId)
-        val settingsPage: SettingsPage = SettingsPage()
+        val settingsPage: SettingsPage = SettingsPage(context, btnApply)
 
         var tag: String? = null
         var tagType: String? = null
@@ -36,18 +36,19 @@ class SettingsPageBuilder(
             tagType = parser.getAttributeValue(null, "type")
 
             // Parse tag starts
-            if (event == XmlResourceParser.START_TAG && tag == "setting" && !tagType.isNullOrEmpty()) {
-                event = when (tagType) {
+            event = if (event == XmlResourceParser.START_TAG && tag == "setting" && !tagType.isNullOrEmpty()) {
+                when (tagType) {
                     "text" -> buildText(parser, settingsPage)
-                    "dropdown" -> buildDropdown(parser)
+                    "dropdown" -> buildDropdown(parser, settingsPage)
                     else -> throw Exception("Unknown tag type")
                 }
             } else {
-                event = parser.next()
+                parser.next()
             }
         }
 
-        settingsPage.setup(context, btnApply)
+        settingsPage.setup()
+        return settingsPage
     }
 
     // Inflate and initialize a text setting field.
@@ -66,31 +67,55 @@ class SettingsPageBuilder(
     }
 
     // Inflate and set up a dropdown setting field.
-    private fun buildDropdown(parser: XmlResourceParser): Int {
-        val dropdownSetting: View =
-            layoutInflater.inflate(R.layout.settings_dropdown, settingsList, false)
-        dropdownSetting.findViewById<TextView>(R.id.label).text = attrToString(parser, "label")
-        dropdownSetting.findViewById<TextView>(R.id.description).text = attrToString(parser, "desc")
-        settingsList.addView(dropdownSetting)
+    private fun buildDropdown(parser: XmlResourceParser, settingsPage: SettingsPage): Int {
+        val view: View = layoutInflater.inflate(R.layout.settings_dropdown, settingsList, false)
+        val label: String = attrToString(parser, "label")
+        val desc: String = attrToString(parser, "desc")
+        val dataStoreType: String = parser.getAttributeValue(null, "dataStoreType")
 
         // Process dropdown options
-        val spinner = dropdownSetting.findViewById<Spinner>(R.id.spinner)
+        val spinner = view.findViewById<Spinner>(R.id.spinner)
 
-        val spinnerArray = ArrayList<String>()
-        spinnerArray.add("one")
-        spinnerArray.add("two")
-        spinnerArray.add("three")
-        spinnerArray.add("four")
-        spinnerArray.add("five")
+        when (dataStoreType) {
+            "bool" -> {
+                val options = gatherDropdownOptions(parser) { str -> str.toBoolean() }
+                val spinnerArrayAdapter: ArrayAdapter<String> =
+                    ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, options.map { option -> option.getLabel() })
+                val preferenceKey: Preferences.Key<Boolean> = booleanPreferencesKey(attrToString(parser, "dataStoreKey"))
+                val settingDropdown: SettingDropdown<Boolean> = SettingDropdown(btnApply, view, label, desc, options, preferenceKey)
 
-        val spinnerArrayAdapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
-        spinner.adapter = spinnerArrayAdapter
-        spinner.setSelection(2)
+                spinner.adapter = spinnerArrayAdapter
+                settingsPage.add(settingDropdown)
+            }
 
-        // TODO: Complete all callbacks and events here
+            // TODO: Other types if necessary
+            else -> throw Exception("Unknown dropdown settings type")
+        }
 
+        settingsList.addView(view)
         return parser.next()
+    }
+
+    // Expects the parser to have one or multiple incoming <item>s
+    // Stops at the first </setting>
+    private fun <T> gatherDropdownOptions(parser: XmlResourceParser, evaluator: (String) -> T) : ArrayList<SettingDropdown.Option<T>> {
+        val options: ArrayList<SettingDropdown.Option<T>> = ArrayList()
+        var event: Int = parser.eventType
+
+        while (true) {
+            event = if (event == XmlResourceParser.END_DOCUMENT) {
+                throw Exception("Invalid document format")
+            } else if (event == XmlResourceParser.START_TAG && parser.name == "item") {
+                val label: String = attrToString(parser, "label")
+                val value: String = attrToString(parser, "value")
+                options.add(SettingDropdown.Option(label, evaluator(value)))
+                parser.next()
+            } else if (event == XmlResourceParser.END_TAG && parser.name == "setting") {
+                return options
+            } else {
+                parser.next()
+            }
+        }
     }
 
     // Supports both string literal and string resource in attributes
