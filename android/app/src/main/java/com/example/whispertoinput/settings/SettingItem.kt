@@ -18,6 +18,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
+// The abstract class for setting widget management.
+// setup(): Initialize data from dataStore (if any),
+//          and configure when to setIsDirty() (usually upon edited).
+// apply(): write to settings if the widget is dirty.
+// Dirtiness can be set, retrieved and reset.
 abstract class SettingItem(private val btnApply: Button) {
     private var isDirty: Boolean = false
     private var ignoringDirtiness: Boolean = false
@@ -65,6 +70,9 @@ abstract class SettingItem(private val btnApply: Button) {
     }
 }
 
+// Setting widgets for editable text.
+// Pass in the inflated view (currently settings_text.xml),
+// text label, description, input field hint, and a data store key.
 class SettingText(
     btnApply: Button,
     private val view: View,
@@ -109,6 +117,9 @@ class SettingText(
     }
 }
 
+// Setting widgets for dropdown menus.
+// Pass in the inflated view (currently settings_dropdown.xml),
+// text label, description, a list of options, and a data store key.
 class SettingDropdown<T>(
     btnApply: Button,
     private val view: View,
@@ -142,13 +153,12 @@ class SettingDropdown<T>(
         val spinner = view.findViewById<Spinner>(R.id.spinner)
 
         // Add options
-        val spinnerArray = ArrayList<String>()
-        options.forEach { option ->
-            spinnerArray.add(option.getLabel())
+        val spinnerList: List<String> = options.map { option ->
+            option.getLabel()
         }
 
         val spinnerArrayAdapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
+            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerList)
         spinner.adapter = spinnerArrayAdapter
 
         spinner.isEnabled = false

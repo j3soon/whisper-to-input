@@ -13,7 +13,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.whispertoinput.R
 
-
+// The class responsible for building a whole SettingsPage
+// from an xml file.
 class SettingsPageBuilder(
     private val context: Context,
     private val btnApply: Button,
@@ -105,11 +106,13 @@ class SettingsPageBuilder(
         while (true) {
             event = if (event == XmlResourceParser.END_DOCUMENT) {
                 throw Exception("Invalid document format")
+            // Capture <item>
             } else if (event == XmlResourceParser.START_TAG && parser.name == "item") {
                 val label: String = attrToString(parser, "label")
                 val value: String = attrToString(parser, "value")
                 options.add(SettingDropdown.Option(label, evaluator(value)))
                 parser.next()
+            // Capture </setting>
             } else if (event == XmlResourceParser.END_TAG && parser.name == "setting") {
                 return options
             } else {
@@ -118,6 +121,7 @@ class SettingsPageBuilder(
         }
     }
 
+    // Retrieves some attribute given the current parser tag.
     // Supports both string literal and string resource in attributes
     private fun attrToString(parser: XmlResourceParser, attribute: String): String {
         val emptyString: String = context.getString(R.string.empty_string)

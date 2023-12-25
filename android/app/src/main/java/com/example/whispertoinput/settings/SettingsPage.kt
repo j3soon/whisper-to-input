@@ -9,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// The class managing all SettingItems.
+// Responsible for setting them all up, and applying all settings.
 class SettingsPage(private val context: Context, private val btnApply: Button) {
     private val settingItems: ArrayList<SettingItem>  = ArrayList<SettingItem>()
 
