@@ -42,7 +42,7 @@ private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
 
 class WhisperInputService : InputMethodService() {
     private val whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
-    private val whisperJobManager: WhisperTranscriber = WhisperTranscriber()
+    private val whisperTranscriber: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager? = null
     private var recorderFsm: RecorderFSM? = null
     private var recordedAudioFilename: String = ""
@@ -138,7 +138,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun onStartTranscription(includeNewline: Boolean) {
         recorderManager!!.stop()
-        whisperJobManager.startAsync(this,
+        whisperTranscriber.startAsync(this,
             recordedAudioFilename,
             AUDIO_MEDIA_TYPE,
             includeNewline,
@@ -147,7 +147,7 @@ class WhisperInputService : InputMethodService() {
     }
 
     private fun onCancelTranscription() {
-        whisperJobManager.stop()
+        whisperTranscriber.stop()
     }
 
     private fun onDeleteText() {
@@ -192,7 +192,7 @@ class WhisperInputService : InputMethodService() {
 
     override fun onWindowShown() {
         super.onWindowShown()
-        whisperJobManager.stop()
+        whisperTranscriber.stop()
         whisperKeyboard.reset()
         recorderManager!!.stop()
 
@@ -206,7 +206,7 @@ class WhisperInputService : InputMethodService() {
 
     override fun onWindowHidden() {
         super.onWindowHidden()
-        whisperJobManager.stop()
+        whisperTranscriber.stop()
         whisperKeyboard.reset()
         recorderManager!!.stop()
     }
