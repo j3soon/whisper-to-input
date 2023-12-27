@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  <Settings> defines the settings page.
+  <setting> defines a setting widget. Attributes include,
+    - label: the textual label to be displayed.
+    - desc: the textual description to be displayed.
+    - type: the type of this setting widget. Currently there are "text" and "dropdown".
+    - dataStoreType: the data type to be stored. Currently there are "string" and "bool".
+        "text" typed settings only use "string".
+    - dataStoreKey: the data store key.
+    - hint: the textual hint for the setting. Currently is only for "text" typed.
+    - default: the default value to be used if no value is stored. Currently is only for "dropdown" typed.
+  <item> defines a dropdown option. Attributes include,
+    - label: the textual label to be displayed.
+    - value: the value to be stored for this option.
+-->
 <Settings>
     <setting
         label="@string/settings_request_style"
