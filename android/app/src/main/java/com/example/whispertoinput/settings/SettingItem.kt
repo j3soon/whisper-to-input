@@ -104,8 +104,8 @@ class SettingText(
         val value: String? = readSetting(context, preferenceKey)
         if (!value.isNullOrEmpty()) {
             textField.setText(value)
-            setIgnoringDirtiness(false)
         }
+        setIgnoringDirtiness(false)
         textField.isEnabled = true
     }
 
@@ -168,8 +168,8 @@ class SettingDropdown<T>(
         val value: T? = readSetting(context, preferenceKey)
         if (value != null) {
             spinner.setSelection(valueToIdx[value]!!)
-            setIgnoringDirtiness(false)
         }
+        setIgnoringDirtiness(false)
         spinner.isEnabled = true
     }
 
