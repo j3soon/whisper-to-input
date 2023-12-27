@@ -126,7 +126,8 @@ class SettingDropdown<T>(
     private val label: String,
     private val desc: String,
     private val options: ArrayList<Option<T>>,
-    private val preferenceKey: Preferences.Key<T>
+    private val preferenceKey: Preferences.Key<T>,
+    private val defaultValue: T
 ) : SettingItem(btnApply), AdapterView.OnItemSelectedListener {
 
     class Option<T>(private val label: String, private val value: T) {
@@ -164,10 +165,13 @@ class SettingDropdown<T>(
         spinner.isEnabled = false
         spinner.onItemSelectedListener = this
 
-        // Read data
+        // Read data. If none, apply default value.
         val value: T? = readSetting(context, preferenceKey)
         if (value != null) {
             spinner.setSelection(valueToIdx[value]!!)
+        } else {
+            writeSetting(context, preferenceKey, defaultValue)
+            spinner.setSelection(valueToIdx[defaultValue]!!)
         }
         setIgnoringDirtiness(false)
         spinner.isEnabled = true
