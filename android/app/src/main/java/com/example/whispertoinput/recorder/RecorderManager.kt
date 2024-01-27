@@ -38,7 +38,10 @@ private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
 
 class RecorderManager(context: Context) {
     companion object {
-        fun requiredPermissions() = arrayOf(Manifest.permission.RECORD_AUDIO)
+        fun requiredPermissions() = arrayOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.POST_NOTIFICATIONS,
+        )
     }
 
     private var recorder: MediaRecorder? = null

@@ -54,7 +54,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
+// 200 and 201 are an arbitrary values, as long as they do not conflict with each other
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
+private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 201
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
@@ -92,19 +94,25 @@ class MainActivity : AppCompatActivity() {
 
     // Checks whether permissions are granted. If not, automatically make a request.
     private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_DENIED
-        ) {
-            // Shows a popup for permission request.
-            // If the permission has been previously (hard-)denied, the popup will not show.
-            // onRequestPermissionsResult will be called in either case.
-            ActivityCompat.requestPermissions(
-                this,
-                RecorderManager.requiredPermissions(),
-                MICROPHONE_PERMISSION_REQUEST_CODE
-            )
+        val permission_and_code = arrayOf(
+            Pair(Manifest.permission.RECORD_AUDIO, MICROPHONE_PERMISSION_REQUEST_CODE),
+            Pair(Manifest.permission.POST_NOTIFICATIONS, NOTIFICATION_PERMISSION_REQUEST_CODE),
+        )
+        for ((permission, code) in permission_and_code) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                // Shows a popup for permission request.
+                // If the permission has been previously (hard-)denied, the popup will not show.
+                // onRequestPermissionsResult will be called in either case.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(permission),
+                    code
+                )
+            }
         }
     }
 
@@ -115,20 +123,21 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        var msg: String;
 
         // Only handles requests marked with the unique code.
-        if (requestCode != MICROPHONE_PERMISSION_REQUEST_CODE) {
+        if (requestCode == MICROPHONE_PERMISSION_REQUEST_CODE) {
+            msg = getString(R.string.mic_permission_required)
+        } else if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            msg = getString(R.string.notification_permission_required)
+        } else {
             return
         }
 
         // All permissions should be granted.
         for (result in grantResults) {
             if (result != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.mic_permission_required),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 return
             }
         }

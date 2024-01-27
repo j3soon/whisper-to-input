@@ -20,6 +20,7 @@
 package com.example.whispertoinput
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -41,6 +42,7 @@ class WhisperTranscriber {
         val apiKey: String
     )
 
+    private val TAG = "WhisperTranscriber"
     private var currentTranscriptionJob: Job? = null
 
     fun startAsync(
@@ -55,16 +57,22 @@ class WhisperTranscriber {
             // Retrieve configs
             val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
-                    preferences[ENDPOINT] ?: "",
+            preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "en",
                     preferences[REQUEST_STYLE] ?: true,
                     preferences[API_KEY] ?: ""
                 )
             }.first()
 
+            // Foolproof message
+            if (endpoint == "") {
+                throw Exception(context.getString(R.string.error_endpoint_unset))
+            }
+
             // Make request
             val client = OkHttpClient()
             val request = buildWhisperRequest(
+                context,
                 filename,
                 "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt",
                 mediaType,
@@ -108,6 +116,7 @@ class WhisperTranscriber {
 
             // If exception message is not null
             if (!exceptionMessage.isNullOrEmpty()) {
+                Log.e(TAG, exceptionMessage)
                 exceptionCallback(exceptionMessage)
             }
         }
@@ -125,6 +134,7 @@ class WhisperTranscriber {
     }
 
     private fun buildWhisperRequest(
+        context: Context,
         filename: String,
         url: String,
         mediaType: String,
@@ -150,6 +160,10 @@ class WhisperTranscriber {
 
         val requestHeaders: Headers = Headers.Builder().apply {
             if (isRequestStyleOpenaiApi) {
+                // Foolproof message
+                if (apiKey == "") {
+                    throw Exception(context.getString(R.string.error_apikey_unset))
+                }
                 add("Authorization", "Bearer $apiKey")
             }
             add("Content-Type", "multipart/form-data")
