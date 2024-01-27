@@ -1,6 +1,6 @@
 # Whisper To Input
 
-An Android keyboard that performs speech-to-text (STT/ASR) with OpenAI Whisper and input the recognized text; Supports English, Chinese, Japanese, etc. and even mixed languages.
+An Android keyboard that performs speech-to-text (STT/ASR) with OpenAI Whisper and input the recognized text; Supports English, Chinese, Japanese, etc. and even mixed languages and Taiwanese.
 
 ## Installation
 
@@ -97,6 +97,7 @@ See [the adb doc](https://developer.android.com/tools/logcat) for more info.
 ## FAQ and Known Issues
 
 - Sometimes the keyboard will silently fail, please see issue [#17](https://github.com/j3soon/whisper-to-input/issues/17) for further information.
+- Taiwanese (or Hokkien) transcription seems to work quiet well, although [not declared officially](https://github.com/openai/whisper) (thanks [@ijsun](https://github.com/ijsun) for discovering this). To support Taiwanese transcription, do not set the `Language Code` in the settings page.
 
 Please [open an issue](https://github.com/j3soon/whisper-to-input/issues) if you have any questions.
 
