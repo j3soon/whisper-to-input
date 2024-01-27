@@ -23,11 +23,11 @@
     <string name="whisper_to_input_settings_title">Whisper To Input Settings</string>
     <string name="settings_btn_apply">Apply</string>
     <string name="settings_request_style">Request Style</string>
-    <string name="settings_request_style_desc">Whether to use the official OpenAI API Endpoint, or a Whisper Webservice (with customized endpoint).</string>
+    <string name="settings_request_style_desc">Use the official OpenAI API or Whisper Webservice request style.</string>
     <string name="settings_option_openai_api">OpenAI API</string>
     <string name="settings_option_whisper_webservice">Whisper Webservice</string>
     <string name="settings_endpoint">Endpoint</string>
-    <string name="settings_endpoint_desc">The host and port for the Whisper Webservice endpoint.</string>
+    <string name="settings_endpoint_desc">The host and port for the OpenAI API or Whisper Webservice endpoint.</string>
     <string name="settings_endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
     <string name="settings_language_code">Language Code</string>
     <string name="settings_language_code_desc">The language code to be included in the request payload (e.g., en, zh).</string>
