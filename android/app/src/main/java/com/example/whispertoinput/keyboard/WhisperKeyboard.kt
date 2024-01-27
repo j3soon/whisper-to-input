@@ -43,9 +43,9 @@ private val amplitudePowers: Array<Float> = arrayOf(0.5f, 1.0f, 2f, 3f)
 
 class WhisperKeyboard {
     private enum class KeyboardStatus {
-        Idle,       // Ready to start recording
-        Recording,  // Currently recording
-        Waiting,    // Waiting for speech-to-text results
+        Idle,             // Ready to start recording
+        Recording,       // Currently recording
+        Transcribing,    // Waiting for transcription results
     }
 
     // Keyboard event listeners. Assignable custom behaviors upon certain UI events (user-operated).
@@ -183,7 +183,7 @@ class WhisperKeyboard {
 
     fun tryStartTranscribing(includeNewline: Boolean) {
         if (keyboardStatus == KeyboardStatus.Recording) {
-            setKeyboardStatus(KeyboardStatus.Waiting)
+            setKeyboardStatus(KeyboardStatus.Transcribing)
             onStartTranscribing(includeNewline)
         }
     }
@@ -207,7 +207,7 @@ class WhisperKeyboard {
         // Upon button mic click...
         // Idle -> Start Recording
         // Recording -> Finish Recording (without a newline)
-        // Waiting -> Nothing (to avoid double-clicking by mistake, which starts transcribing and then immediately cancels it)
+        // Transcribing -> Nothing (to avoid double-clicking by mistake, which starts transcribing and then immediately cancels it)
         when (keyboardStatus) {
             KeyboardStatus.Idle -> {
                 setKeyboardStatus(KeyboardStatus.Recording)
@@ -215,11 +215,11 @@ class WhisperKeyboard {
             }
 
             KeyboardStatus.Recording -> {
-                setKeyboardStatus(KeyboardStatus.Waiting)
+                setKeyboardStatus(KeyboardStatus.Transcribing)
                 onStartTranscribing(false)
             }
 
-            KeyboardStatus.Waiting -> {
+            KeyboardStatus.Transcribing -> {
                 return
             }
         }
@@ -230,7 +230,7 @@ class WhisperKeyboard {
         // Recording -> Start transcribing (with a newline included)
         // else -> invokes onEnter
         if (keyboardStatus == KeyboardStatus.Recording) {
-            setKeyboardStatus(KeyboardStatus.Waiting)
+            setKeyboardStatus(KeyboardStatus.Transcribing)
             onStartTranscribing(true)
         } else {
             onEnter()
@@ -240,12 +240,12 @@ class WhisperKeyboard {
     private fun onButtonCancelClick() {
         // Upon button cancel click.
         // Recording -> Cancel
-        // Waiting -> Cancel
+        // Transcribing -> Cancel
         // else -> nothing
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Idle)
             onCancelRecording()
-        } else if (keyboardStatus == KeyboardStatus.Waiting) {
+        } else if (keyboardStatus == KeyboardStatus.Transcribing) {
             setKeyboardStatus(KeyboardStatus.Idle)
             onCancelTranscribing()
         }
@@ -273,7 +273,7 @@ class WhisperKeyboard {
                 micRippleContainer!!.visibility = View.VISIBLE
             }
 
-            KeyboardStatus.Waiting -> {
+            KeyboardStatus.Transcribing -> {
                 labelStatus!!.setText(R.string.transcribing)
                 buttonMic!!.setImageResource(R.drawable.mic_transcribing)
                 waitingIcon!!.visibility = View.VISIBLE
