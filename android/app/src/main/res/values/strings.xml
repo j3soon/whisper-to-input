@@ -20,6 +20,10 @@
     <string name="btn_previous_ime_hint">Switch To Previous Input Method</string>
     <string name="generate_logcat">Generate Recent Logcat</string>
 
+    <!-- Warning and Error Messages -->
+    <string name="error_endpoint_unset">Error: Endpoint is not set in settings.</string>
+    <string name="error_apikey_unset">Error: OpenAI API Key is not set in settings.</string>
+
     <!-- Settings -->
     <string name="whisper_to_input_settings_title">Whisper To Input Settings</string>
     <string name="settings_btn_apply">Apply</string>
