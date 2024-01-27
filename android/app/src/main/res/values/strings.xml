@@ -12,7 +12,8 @@
     <string name="start_speech_to_text">Start speech-to-text.</string>
     <string name="start_transcribing">Start transcribing.</string>
     <string name="grant_microphone_permission">Grant Microphone Permission</string>
-    <string name="mic_permission_required">Whisper to Input requires microphone usage to work.</string>
+    <string name="mic_permission_required">Whisper to Input requires microphone permission to work.</string>
+    <string name="notification_permission_required">Whisper to Input requires notification permission to work.</string>
     <string name="microphone">Microphone</string>
     <string name="successfully_set">Successfully set!</string>
     <string name="backspace_button_hint">Backspace Button</string>
