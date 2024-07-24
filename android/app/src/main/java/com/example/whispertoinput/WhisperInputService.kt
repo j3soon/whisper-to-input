@@ -91,6 +91,7 @@ class WhisperInputService : InputMethodService() {
             { onCancelTranscription() },
             { onDeleteText() },
             { onEnter() },
+            { onSpaceBar() },
             { onSwitchIme() },
             { onOpenSettings() })
     }
@@ -162,6 +163,11 @@ class WhisperInputService : InputMethodService() {
     private fun onEnter() {
         val inputConnection = currentInputConnection ?: return
         inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+    }
+
+    private fun onSpaceBar() {
+        val inputConnection = currentInputConnection ?: return
+        inputConnection.commitText(" ", 1)
     }
 
     // Opens up app MainActivity

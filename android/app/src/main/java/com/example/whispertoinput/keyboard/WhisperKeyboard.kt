@@ -57,6 +57,7 @@ class WhisperKeyboard {
     private var onSwitchIme: () -> Unit = { }
     private var onOpenSettings: () -> Unit = { }
     private var onEnter: () -> Unit = { }
+    private var onSpaceBar: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -67,6 +68,7 @@ class WhisperKeyboard {
     private var buttonEnter: ImageButton? = null
     private var buttonCancel: ImageButton? = null
     private var labelStatus: TextView? = null
+    private var buttonSpaceBar: ImageButton? = null
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: BackspaceButton? = null
     private var buttonPreviousIme: ImageButton? = null
@@ -83,6 +85,7 @@ class WhisperKeyboard {
         onCancelTranscribing: () -> Unit,
         onButtonBackspace: () -> Unit,
         onEnter: () -> Unit,
+        onSpaceBar: () -> Unit,
         onSwitchIme: () -> Unit,
         onOpenSettings: () -> Unit
     ): View {
@@ -92,6 +95,7 @@ class WhisperKeyboard {
         buttonEnter = keyboardView!!.findViewById(R.id.btn_enter) as ImageButton
         buttonCancel = keyboardView!!.findViewById(R.id.btn_cancel) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
+        buttonSpaceBar = keyboardView!!.findViewById(R.id.btn_space_bar) as ImageButton
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as BackspaceButton
         buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
@@ -115,6 +119,7 @@ class WhisperKeyboard {
         buttonCancel!!.setOnClickListener { onButtonCancelClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
+        buttonSpaceBar!!.setOnClickListener { onButtonSpaceBarClick() }
 
         if (shouldOfferImeSwitch) {
             buttonPreviousIme!!.setOnClickListener { onButtonPreviousImeClick() }
@@ -129,6 +134,7 @@ class WhisperKeyboard {
         this.onSwitchIme = onSwitchIme
         this.onOpenSettings = onOpenSettings
         this.onEnter = onEnter
+        this.onSpaceBar = onSpaceBar
 
         // Resets keyboard upon setup
         reset()
@@ -186,6 +192,11 @@ class WhisperKeyboard {
             setKeyboardStatus(KeyboardStatus.Transcribing)
             onStartTranscribing(includeNewline)
         }
+    }
+
+    private fun onButtonSpaceBarClick() {
+        // Currently, this onClick only makes a call to onSpaceBar
+        this.onSpaceBar()
     }
 
     private fun onButtonBackspaceClick() {
