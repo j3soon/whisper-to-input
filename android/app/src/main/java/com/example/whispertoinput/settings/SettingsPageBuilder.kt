@@ -79,11 +79,11 @@ class SettingsPageBuilder(
 
         when (dataStoreType) {
             "bool" -> {
+                val preferenceKey: Preferences.Key<Boolean> = booleanPreferencesKey(attrToString(parser, "dataStoreKey"))
+                val defaultValue: Boolean = attrToString(parser, "default").toBoolean()
                 val options = gatherDropdownOptions(parser) { str -> str.toBoolean() }
                 val spinnerArrayAdapter: ArrayAdapter<String> =
                     ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, options.map { option -> option.getLabel() })
-                val preferenceKey: Preferences.Key<Boolean> = booleanPreferencesKey(attrToString(parser, "dataStoreKey"))
-                val defaultValue: Boolean = attrToString(parser, "default").toBoolean()
                 val settingDropdown: SettingDropdown<Boolean> = SettingDropdown(btnApply, view, label, desc, options, preferenceKey, defaultValue)
 
                 spinner.adapter = spinnerArrayAdapter
