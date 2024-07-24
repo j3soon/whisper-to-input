@@ -30,9 +30,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.whispertoinput.keyboard.WhisperKeyboard
-import com.example.whispertoinput.recorder.RecorderFSM
 import com.example.whispertoinput.recorder.RecorderManager
-import com.example.whispertoinput.recorder.RecorderStateOutput
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 import com.github.liuyueyi.quick.transfer.constants.TransType
 
@@ -44,7 +42,6 @@ class WhisperInputService : InputMethodService() {
     private val whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private val whisperTranscriber: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager? = null
-    private var recorderFsm: RecorderFSM? = null
     private var recordedAudioFilename: String = ""
     private var isFirstTime: Boolean = true
 
@@ -62,7 +59,6 @@ class WhisperInputService : InputMethodService() {
     override fun onCreateInputView(): View {
         // Initialize members with regard to this context
         recorderManager = RecorderManager(this)
-        recorderFsm = RecorderFSM(this)
 
         // Preload conversion table
         ChineseUtils.preLoad(true, TransType.SIMPLE_TO_TAIWAN)
@@ -109,27 +105,12 @@ class WhisperInputService : InputMethodService() {
         }
 
         recorderManager!!.start(this, recordedAudioFilename)
-        recorderFsm!!.reset()
     }
 
+    // when mic amplitude is updated, notify the keyboard
+    // this callback is registered to the recorder manager
     private fun onUpdateMicrophoneAmplitude(amplitude: Int) {
-        // Reports amplitude to fsm.
-        when (recorderFsm!!.reportAmplitude(amplitude)) {
-            // Normally, just update keyboard visuals
-            RecorderStateOutput.Normal -> {
-                whisperKeyboard.updateMicrophoneAmplitude(amplitude)
-            }
-            // If the fsm indicates cancellation,
-            // simulates a click of the mic button to cancel recording
-            RecorderStateOutput.CancelRecording -> {
-                whisperKeyboard.tryCancelRecording()
-            }
-            // If the fsm indicates finish,
-            // simulates a click of the done button to start transcribing
-            RecorderStateOutput.FinishRecording -> {
-                whisperKeyboard.tryStartTranscribing(false)
-            }
-        }
+        whisperKeyboard.updateMicrophoneAmplitude(amplitude)
     }
 
     private fun onCancelRecording() {
