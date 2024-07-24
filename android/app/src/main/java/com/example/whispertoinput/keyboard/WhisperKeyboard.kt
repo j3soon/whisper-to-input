@@ -263,6 +263,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.INVISIBLE
                 micRippleContainer!!.visibility = View.GONE
+                keyboardView!!.keepScreenOn = false
             }
 
             KeyboardStatus.Recording -> {
@@ -271,6 +272,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.VISIBLE
+                keyboardView!!.keepScreenOn = true
             }
 
             KeyboardStatus.Transcribing -> {
@@ -279,6 +281,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.VISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.GONE
+                keyboardView!!.keepScreenOn = true
             }
         }
 
