@@ -48,6 +48,7 @@
             android:text="@string/whisper_to_input_settings_title"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/theme_rich_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_settings_apply"
             app:layout_constraintHorizontal_bias="0.0"

@@ -5,5 +5,21 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
+    <style name="RegularImage">
+        <item name="android:tint">@color/theme_rich_black</item>
+    </style>
+
+    <style name="RegularText">
+        <item name="android:textColor">@color/theme_rich_black</item>
+    </style>
+
+    <style name="Background">
+        <item name="android:background">@color/theme_light_yellow</item>
+    </style>
+
+    <style name="TopBar">
+        <item name="android:background">@color/theme_rich_black</item>
+    </style>
+
     <style name="Theme.WhisperToInput" parent="Base.Theme.WhisperToInput" />
 </resources>

@@ -4,4 +4,21 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+
+    <style name="RegularImage">
+        <item name="android:tint">#AAA</item>
+    </style>
+
+    <style name="RegularText">
+        <item name="android:textColor">#AAA</item>
+    </style>
+
+    <style name="Background">
+        <item name="android:background">#373737</item>
+    </style>
+
+    <style name="TopBar">
+        <item name="android:background">#AAAAAA</item>
+    </style>
+
 </resources>
