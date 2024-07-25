@@ -51,7 +51,7 @@ class WhisperKeyboard {
     // Keyboard event listeners. Assignable custom behaviors upon certain UI events (user-operated).
     private var onStartRecording: () -> Unit = { }
     private var onCancelRecording: () -> Unit = { }
-    private var onStartTranscribing: (includeNewline: Boolean) -> Unit = { }
+    private var onStartTranscribing: (attachToEnd: String) -> Unit = { }
     private var onCancelTranscribing: () -> Unit = { }
     private var onButtonBackspace: () -> Unit = { }
     private var onSwitchIme: () -> Unit = { }
@@ -81,7 +81,7 @@ class WhisperKeyboard {
         shouldOfferImeSwitch: Boolean,
         onStartRecording: () -> Unit,
         onCancelRecording: () -> Unit,
-        onStartTranscribing: (includeNewline: Boolean) -> Unit,
+        onStartTranscribing: (attachToEnd: String) -> Unit,
         onCancelTranscribing: () -> Unit,
         onButtonBackspace: () -> Unit,
         onEnter: () -> Unit,
@@ -187,16 +187,23 @@ class WhisperKeyboard {
         }
     }
 
-    fun tryStartTranscribing(includeNewline: Boolean) {
+    fun tryStartTranscribing(attachToEnd: String) {
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Transcribing)
-            onStartTranscribing(includeNewline)
+            onStartTranscribing(attachToEnd)
         }
     }
 
     private fun onButtonSpaceBarClick() {
-        // Currently, this onClick only makes a call to onSpaceBar
-        this.onSpaceBar()
+        // Upon button space bar click.
+        // Recording -> Start transcribing (with a whitespace included)
+        // else -> invokes onSpaceBar
+        if (keyboardStatus == KeyboardStatus.Recording) {
+            setKeyboardStatus(KeyboardStatus.Transcribing)
+            onStartTranscribing(" ")
+        } else {
+            onSpaceBar()
+        }
     }
 
     private fun onButtonBackspaceClick() {
@@ -227,7 +234,7 @@ class WhisperKeyboard {
 
             KeyboardStatus.Recording -> {
                 setKeyboardStatus(KeyboardStatus.Transcribing)
-                onStartTranscribing(false)
+                onStartTranscribing("")
             }
 
             KeyboardStatus.Transcribing -> {
@@ -242,7 +249,7 @@ class WhisperKeyboard {
         // else -> invokes onEnter
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Transcribing)
-            onStartTranscribing(true)
+            onStartTranscribing("\r\n")
         } else {
             onEnter()
         }

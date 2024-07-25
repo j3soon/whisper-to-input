@@ -93,7 +93,7 @@ class WhisperInputService : InputMethodService() {
             shouldOfferImeSwitch,
             { onStartRecording() },
             { onCancelRecording() },
-            { includeNewline -> onStartTranscription(includeNewline) },
+            { attachToEnd -> onStartTranscription(attachToEnd) },
             { onCancelTranscription() },
             { onDeleteText() },
             { onEnter() },
@@ -124,12 +124,12 @@ class WhisperInputService : InputMethodService() {
         recorderManager!!.stop()
     }
 
-    private fun onStartTranscription(includeNewline: Boolean) {
+    private fun onStartTranscription(attachToEnd: String) {
         recorderManager!!.stop()
         whisperTranscriber.startAsync(this,
             recordedAudioFilename,
             AUDIO_MEDIA_TYPE,
-            includeNewline,
+            attachToEnd,
             { transcriptionCallback(it) },
             { transcriptionExceptionCallback(it) })
     }
