@@ -51,12 +51,13 @@ class WhisperKeyboard {
     // Keyboard event listeners. Assignable custom behaviors upon certain UI events (user-operated).
     private var onStartRecording: () -> Unit = { }
     private var onCancelRecording: () -> Unit = { }
-    private var onStartTranscribing: (includeNewline: Boolean) -> Unit = { }
+    private var onStartTranscribing: (attachToEnd: String) -> Unit = { }
     private var onCancelTranscribing: () -> Unit = { }
     private var onButtonBackspace: () -> Unit = { }
     private var onSwitchIme: () -> Unit = { }
     private var onOpenSettings: () -> Unit = { }
     private var onEnter: () -> Unit = { }
+    private var onSpaceBar: () -> Unit = { }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -67,6 +68,7 @@ class WhisperKeyboard {
     private var buttonEnter: ImageButton? = null
     private var buttonCancel: ImageButton? = null
     private var labelStatus: TextView? = null
+    private var buttonSpaceBar: ImageButton? = null
     private var waitingIcon: ProgressBar? = null
     private var buttonBackspace: BackspaceButton? = null
     private var buttonPreviousIme: ImageButton? = null
@@ -79,10 +81,11 @@ class WhisperKeyboard {
         shouldOfferImeSwitch: Boolean,
         onStartRecording: () -> Unit,
         onCancelRecording: () -> Unit,
-        onStartTranscribing: (includeNewline: Boolean) -> Unit,
+        onStartTranscribing: (attachToEnd: String) -> Unit,
         onCancelTranscribing: () -> Unit,
         onButtonBackspace: () -> Unit,
         onEnter: () -> Unit,
+        onSpaceBar: () -> Unit,
         onSwitchIme: () -> Unit,
         onOpenSettings: () -> Unit
     ): View {
@@ -92,6 +95,7 @@ class WhisperKeyboard {
         buttonEnter = keyboardView!!.findViewById(R.id.btn_enter) as ImageButton
         buttonCancel = keyboardView!!.findViewById(R.id.btn_cancel) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
+        buttonSpaceBar = keyboardView!!.findViewById(R.id.btn_space_bar) as ImageButton
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
         buttonBackspace = keyboardView!!.findViewById(R.id.btn_backspace) as BackspaceButton
         buttonPreviousIme = keyboardView!!.findViewById(R.id.btn_previous_ime) as ImageButton
@@ -115,6 +119,7 @@ class WhisperKeyboard {
         buttonCancel!!.setOnClickListener { onButtonCancelClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
+        buttonSpaceBar!!.setOnClickListener { onButtonSpaceBarClick() }
 
         if (shouldOfferImeSwitch) {
             buttonPreviousIme!!.setOnClickListener { onButtonPreviousImeClick() }
@@ -129,6 +134,7 @@ class WhisperKeyboard {
         this.onSwitchIme = onSwitchIme
         this.onOpenSettings = onOpenSettings
         this.onEnter = onEnter
+        this.onSpaceBar = onSpaceBar
 
         // Resets keyboard upon setup
         reset()
@@ -181,10 +187,22 @@ class WhisperKeyboard {
         }
     }
 
-    fun tryStartTranscribing(includeNewline: Boolean) {
+    fun tryStartTranscribing(attachToEnd: String) {
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Transcribing)
-            onStartTranscribing(includeNewline)
+            onStartTranscribing(attachToEnd)
+        }
+    }
+
+    private fun onButtonSpaceBarClick() {
+        // Upon button space bar click.
+        // Recording -> Start transcribing (with a whitespace included)
+        // else -> invokes onSpaceBar
+        if (keyboardStatus == KeyboardStatus.Recording) {
+            setKeyboardStatus(KeyboardStatus.Transcribing)
+            onStartTranscribing(" ")
+        } else {
+            onSpaceBar()
         }
     }
 
@@ -216,7 +234,7 @@ class WhisperKeyboard {
 
             KeyboardStatus.Recording -> {
                 setKeyboardStatus(KeyboardStatus.Transcribing)
-                onStartTranscribing(false)
+                onStartTranscribing("")
             }
 
             KeyboardStatus.Transcribing -> {
@@ -231,7 +249,7 @@ class WhisperKeyboard {
         // else -> invokes onEnter
         if (keyboardStatus == KeyboardStatus.Recording) {
             setKeyboardStatus(KeyboardStatus.Transcribing)
-            onStartTranscribing(true)
+            onStartTranscribing("\r\n")
         } else {
             onEnter()
         }
@@ -263,6 +281,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.INVISIBLE
                 micRippleContainer!!.visibility = View.GONE
+                keyboardView!!.keepScreenOn = false
             }
 
             KeyboardStatus.Recording -> {
@@ -271,6 +290,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.VISIBLE
+                keyboardView!!.keepScreenOn = true
             }
 
             KeyboardStatus.Transcribing -> {
@@ -279,6 +299,7 @@ class WhisperKeyboard {
                 waitingIcon!!.visibility = View.VISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
                 micRippleContainer!!.visibility = View.GONE
+                keyboardView!!.keepScreenOn = true
             }
         }
 

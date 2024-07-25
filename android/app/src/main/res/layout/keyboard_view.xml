@@ -22,25 +22,26 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Background"
     android:id="@+id/keyboard_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_gravity="bottom"
-    android:background="@color/theme_light_yellow"
     android:clipToPadding="false"
     android:paddingBottom="10dp">
 
     <View
+        style="@style/TopBar"
         android:id="@+id/view_top_bar"
         android:layout_width="wrap_content"
         android:layout_height="10dp"
-        android:background="@color/theme_rich_black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        style="@style/RegularText"
         android:id="@+id/label_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,11 +54,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_top_bar" />
 
+    <ImageButton
+        style="@style/RegularImage"
+        android:id="@+id/btn_space_bar"
+        android:layout_width="123dp"
+        android:layout_height="35dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="@string/desc_space_bar"
+        android:scaleType="fitCenter"
+        android:src="@drawable/btn_space_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_mic_frame"/>
+
     <FrameLayout
         android:id="@+id/btn_mic_frame"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_status">
@@ -143,36 +156,38 @@
 
 
     <ImageButton
+        style="@style/RegularImage"
         android:id="@+id/btn_enter"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="32dp"
         android:background="#00FFFFFF"
         android:contentDescription="@string/start_transcribing"
         android:scaleType="fitCenter"
         android:src="@drawable/btn_enter"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
+        android:translationX="-3dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_space_bar"
         app:layout_constraintEnd_toEndOf="@+id/btn_backspace"
-        app:layout_constraintStart_toStartOf="@+id/btn_backspace" />
+        app:layout_constraintTop_toTopOf="@+id/btn_space_bar" />
 
     <ImageButton
+        style="@style/RegularImage"
         android:id="@+id/btn_cancel"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="32dp"
         android:background="#00FFFFFF"
         android:contentDescription="@string/start_transcribing"
         android:scaleType="fitCenter"
         android:scaleX="0.5"
         android:scaleY="0.5"
+        android:layout_marginEnd="16dp"
         android:src="@drawable/btn_cancel"
-        android:translationY="5dp"
         android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="@+id/btn_mic_frame"
         app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"
-        app:layout_constraintEnd_toEndOf="@+id/btn_settings"
-        app:layout_constraintStart_toStartOf="@+id/btn_settings" />
+        app:layout_constraintEnd_toStartOf="@+id/btn_mic_frame" />
 
     <com.example.whispertoinput.keyboard.BackspaceButton
+        style="@style/RegularImage"
         android:id="@+id/btn_backspace"
         android:layout_width="60dp"
         android:layout_height="50dp"
@@ -186,9 +201,11 @@
         android:scaleType="fitCenter"
         android:src="@drawable/btn_backspace"
         app:layout_constraintStart_toEndOf="@+id/btn_mic_frame"
-        app:layout_constraintTop_toTopOf="@+id/btn_mic_frame" />
+        app:layout_constraintTop_toTopOf="@+id/btn_mic_frame"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_mic_frame"/>
 
     <ImageButton
+        style="@style/RegularImage"
         android:id="@+id/btn_previous_ime"
         android:layout_width="60dp"
         android:layout_height="40dp"
@@ -201,14 +218,16 @@
         app:layout_constraintTop_toBottomOf="@+id/view_top_bar" />
 
     <ImageButton
+        style="@style/RegularImage"
         android:id="@+id/btn_settings"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="16dp"
         android:backgroundTint="#00000000"
         android:contentDescription="@string/btn_previous_ime_hint"
         android:scaleType="fitCenter"
+        android:layout_marginTop="10dp"
         android:src="@drawable/btn_settings"
-        app:layout_constraintEnd_toStartOf="@+id/btn_mic_frame"
-        app:layout_constraintTop_toTopOf="@+id/btn_mic_frame" />
+        app:layout_constraintEnd_toEndOf="@id/btn_backspace"
+        app:layout_constraintTop_toTopOf="@id/label_status"
+        app:layout_constraintBottom_toBottomOf="@id/label_status"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

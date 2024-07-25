@@ -13,9 +13,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.example.whispertoinput.R
 import com.example.whispertoinput.dataStore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // The abstract class for setting widget management.
@@ -30,8 +33,7 @@ abstract class SettingItem(private val btnApply: Button) {
     // Should be used in a CoroutineScope
     abstract suspend fun apply(context: Context)
 
-    // Should be used in a CoroutineScope
-    abstract suspend fun setup(context: Context)
+    abstract fun setup(context: Context) : Job
 
     fun getIsDirty(): Boolean {
         return isDirty
@@ -82,31 +84,33 @@ class SettingText(
     private val preferenceKey: Preferences.Key<String>
 ) : SettingItem(btnApply) {
 
-    override suspend fun setup(context: Context) {
-        // Ignore dirtiness until fully set up
-        setIgnoringDirtiness(true)
+    override fun setup(context: Context) : Job {
+        return CoroutineScope(Dispatchers.Main).launch {
+            // Ignore dirtiness until fully set up
+            setIgnoringDirtiness(true)
 
-        // Assign components
-        view.findViewById<TextView>(R.id.label).text = label
-        view.findViewById<TextView>(R.id.description).text = desc
+            // Assign components
+            view.findViewById<TextView>(R.id.label).text = label
+            view.findViewById<TextView>(R.id.description).text = desc
 
-        // Configure text field & assign onEdit callback
-        val textField = view.findViewById<EditText>(R.id.field)
+            // Configure text field & assign onEdit callback
+            val textField = view.findViewById<EditText>(R.id.field)
 
-        textField.isEnabled = false
-        textField.setText(R.string.empty_string)
-        textField.hint = hint
-        textField.doOnTextChanged { _, _, _, _ ->
-            setIsDirty()
+            textField.isEnabled = false
+            textField.setText(R.string.empty_string)
+            textField.hint = hint
+            textField.doOnTextChanged { _, _, _, _ ->
+                setIsDirty()
+            }
+
+            // Read data
+            val value: String? = readSetting(context, preferenceKey)
+            if (!value.isNullOrEmpty()) {
+                textField.setText(value)
+            }
+            setIgnoringDirtiness(false)
+            textField.isEnabled = true
         }
-
-        // Read data
-        val value: String? = readSetting(context, preferenceKey)
-        if (!value.isNullOrEmpty()) {
-            textField.setText(value)
-        }
-        setIgnoringDirtiness(false)
-        textField.isEnabled = true
     }
 
     override suspend fun apply(context: Context) {
@@ -137,44 +141,48 @@ class SettingDropdown<T>(
 
     private val valueToIdx: HashMap<T, Int> = HashMap<T, Int>()
 
-    override suspend fun setup(context: Context) {
-        // Ignore dirtiness until fully set up
-        setIgnoringDirtiness(true)
+    override fun setup(context: Context) : Job {
+        return CoroutineScope(Dispatchers.Main).launch {
+            // Ignore dirtiness until fully set up
+            setIgnoringDirtiness(true)
 
-        // Assign components
-        view.findViewById<TextView>(R.id.label).text = label
-        view.findViewById<TextView>(R.id.description).text = desc
+            // Assign components
+            view.findViewById<TextView>(R.id.label).text = label
+            view.findViewById<TextView>(R.id.description).text = desc
 
-        // Build value to index
-        options.forEachIndexed { index, option ->
-            valueToIdx[option.getValue()] = index
+            // Build value to index
+            options.forEachIndexed { index, option ->
+                valueToIdx[option.getValue()] = index
+            }
+
+            // Configure spinner & assign onEdit callback
+            val spinner = view.findViewById<Spinner>(R.id.spinner)
+
+            // Add options
+            val spinnerList: List<String> = options.map { option ->
+                option.getLabel()
+            }
+
+            val spinnerArrayAdapter: ArrayAdapter<String> =
+                ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerList)
+            spinner.adapter = spinnerArrayAdapter
+
+            spinner.isEnabled = false
+
+
+            // Read data. If none, apply default value.
+            val value: T? = readSetting(context, preferenceKey)
+            if (value != null) {
+                spinner.setSelection(valueToIdx[value]!!, false)
+            } else {
+                writeSetting(context, preferenceKey, defaultValue)
+                spinner.setSelection(valueToIdx[defaultValue]!!, false)
+            }
+
+            spinner.isEnabled = true
+            spinner.onItemSelectedListener = this@SettingDropdown
+            setIgnoringDirtiness(false)
         }
-
-        // Configure spinner & assign onEdit callback
-        val spinner = view.findViewById<Spinner>(R.id.spinner)
-
-        // Add options
-        val spinnerList: List<String> = options.map { option ->
-            option.getLabel()
-        }
-
-        val spinnerArrayAdapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, spinnerList)
-        spinner.adapter = spinnerArrayAdapter
-
-        spinner.isEnabled = false
-        spinner.onItemSelectedListener = this
-
-        // Read data. If none, apply default value.
-        val value: T? = readSetting(context, preferenceKey)
-        if (value != null) {
-            spinner.setSelection(valueToIdx[value]!!)
-        } else {
-            writeSetting(context, preferenceKey, defaultValue)
-            spinner.setSelection(valueToIdx[defaultValue]!!)
-        }
-        setIgnoringDirtiness(false)
-        spinner.isEnabled = true
     }
 
     override suspend fun apply(context: Context) {

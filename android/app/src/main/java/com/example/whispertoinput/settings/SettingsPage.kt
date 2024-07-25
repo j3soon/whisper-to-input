@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.example.whispertoinput.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 // The class managing all SettingItems.
@@ -22,16 +23,16 @@ class SettingsPage(private val context: Context, private val btnApply: Button) {
         btnApply.setOnClickListener { apply() }
 
         CoroutineScope(Dispatchers.Main).launch {
-            for (settingItem in settingItems) {
-                settingItem.setup(context)
-            }
-
+            btnApply.isEnabled = false
+            // Set up each setting item and wait for them to complete
+            settingItems.map { settingItem -> settingItem.setup(context) }.joinAll()
             btnApply.isEnabled = false
         }
     }
 
     private fun apply() {
         CoroutineScope(Dispatchers.Main).launch {
+            btnApply.isEnabled = false
             for (settingItem in settingItems) {
                 settingItem.apply(context)
                 settingItem.resetIsDirty()

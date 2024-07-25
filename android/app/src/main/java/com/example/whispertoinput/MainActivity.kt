@@ -61,6 +61,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
+val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
 val API_KEY = stringPreferencesKey("api-key")
 
 class MainActivity : AppCompatActivity() {

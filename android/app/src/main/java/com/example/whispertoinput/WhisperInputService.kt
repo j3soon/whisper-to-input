@@ -25,16 +25,20 @@ import android.view.View
 import android.content.Intent
 import android.os.IBinder
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.datastore.preferences.core.Preferences
 import com.example.whispertoinput.keyboard.WhisperKeyboard
-import com.example.whispertoinput.recorder.RecorderFSM
 import com.example.whispertoinput.recorder.RecorderManager
-import com.example.whispertoinput.recorder.RecorderStateOutput
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 import com.github.liuyueyi.quick.transfer.constants.TransType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
@@ -44,7 +48,6 @@ class WhisperInputService : InputMethodService() {
     private val whisperKeyboard: WhisperKeyboard = WhisperKeyboard()
     private val whisperTranscriber: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager? = null
-    private var recorderFsm: RecorderFSM? = null
     private var recordedAudioFilename: String = ""
     private var isFirstTime: Boolean = true
 
@@ -62,7 +65,6 @@ class WhisperInputService : InputMethodService() {
     override fun onCreateInputView(): View {
         // Initialize members with regard to this context
         recorderManager = RecorderManager(this)
-        recorderFsm = RecorderFSM(this)
 
         // Preload conversion table
         ChineseUtils.preLoad(true, TransType.SIMPLE_TO_TAIWAN)
@@ -91,10 +93,11 @@ class WhisperInputService : InputMethodService() {
             shouldOfferImeSwitch,
             { onStartRecording() },
             { onCancelRecording() },
-            { includeNewline -> onStartTranscription(includeNewline) },
+            { attachToEnd -> onStartTranscription(attachToEnd) },
             { onCancelTranscription() },
             { onDeleteText() },
             { onEnter() },
+            { onSpaceBar() },
             { onSwitchIme() },
             { onOpenSettings() })
     }
@@ -109,39 +112,24 @@ class WhisperInputService : InputMethodService() {
         }
 
         recorderManager!!.start(this, recordedAudioFilename)
-        recorderFsm!!.reset()
     }
 
+    // when mic amplitude is updated, notify the keyboard
+    // this callback is registered to the recorder manager
     private fun onUpdateMicrophoneAmplitude(amplitude: Int) {
-        // Reports amplitude to fsm.
-        when (recorderFsm!!.reportAmplitude(amplitude)) {
-            // Normally, just update keyboard visuals
-            RecorderStateOutput.Normal -> {
-                whisperKeyboard.updateMicrophoneAmplitude(amplitude)
-            }
-            // If the fsm indicates cancellation,
-            // simulates a click of the mic button to cancel recording
-            RecorderStateOutput.CancelRecording -> {
-                whisperKeyboard.tryCancelRecording()
-            }
-            // If the fsm indicates finish,
-            // simulates a click of the done button to start transcribing
-            RecorderStateOutput.FinishRecording -> {
-                whisperKeyboard.tryStartTranscribing(false)
-            }
-        }
+        whisperKeyboard.updateMicrophoneAmplitude(amplitude)
     }
 
     private fun onCancelRecording() {
         recorderManager!!.stop()
     }
 
-    private fun onStartTranscription(includeNewline: Boolean) {
+    private fun onStartTranscription(attachToEnd: String) {
         recorderManager!!.stop()
         whisperTranscriber.startAsync(this,
             recordedAudioFilename,
             AUDIO_MEDIA_TYPE,
-            includeNewline,
+            attachToEnd,
             { transcriptionCallback(it) },
             { transcriptionExceptionCallback(it) })
     }
@@ -183,6 +171,11 @@ class WhisperInputService : InputMethodService() {
         inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
     }
 
+    private fun onSpaceBar() {
+        val inputConnection = currentInputConnection ?: return
+        inputConnection.commitText(" ", 1)
+    }
+
     // Opens up app MainActivity
     private fun launchMainActivity() {
         val dialogIntent = Intent(this, MainActivity::class.java)
@@ -197,10 +190,17 @@ class WhisperInputService : InputMethodService() {
         recorderManager!!.stop()
 
         // If this is the first time calling onWindowShown, it means this IME is just being switched to
-        // Automatically starts recording after switching to Whisper Input
-        if (isFirstTime) {
+        // Automatically starts recording after switching to Whisper Input (if settings enabled)
+        // Dispatch a coroutine to do this task.
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!isFirstTime) return@launch
             isFirstTime = false
-            whisperKeyboard.tryStartRecording()
+            val isAutoStartRecording = dataStore.data.map { preferences: Preferences ->
+                preferences[AUTO_RECORDING_START] ?: true
+            }.first()
+            if (isAutoStartRecording) {
+                whisperKeyboard.tryStartRecording()
+            }
         }
     }
 
