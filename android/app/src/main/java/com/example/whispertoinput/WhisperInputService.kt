@@ -25,14 +25,20 @@ import android.view.View
 import android.content.Intent
 import android.os.IBinder
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.datastore.preferences.core.Preferences
 import com.example.whispertoinput.keyboard.WhisperKeyboard
 import com.example.whispertoinput.recorder.RecorderManager
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 import com.github.liuyueyi.quick.transfer.constants.TransType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
@@ -184,10 +190,17 @@ class WhisperInputService : InputMethodService() {
         recorderManager!!.stop()
 
         // If this is the first time calling onWindowShown, it means this IME is just being switched to
-        // Automatically starts recording after switching to Whisper Input
-        if (isFirstTime) {
+        // Automatically starts recording after switching to Whisper Input (if settings enabled)
+        // Dispatch a coroutine to do this task.
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!isFirstTime) return@launch
             isFirstTime = false
-            whisperKeyboard.tryStartRecording()
+            val isAutoStartRecording = dataStore.data.map { preferences: Preferences ->
+                preferences[AUTO_RECORDING_START] ?: true
+            }.first()
+            if (isAutoStartRecording) {
+                whisperKeyboard.tryStartRecording()
+            }
         }
     }
 

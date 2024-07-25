@@ -23,6 +23,7 @@ class SettingsPage(private val context: Context, private val btnApply: Button) {
         btnApply.setOnClickListener { apply() }
 
         CoroutineScope(Dispatchers.Main).launch {
+            btnApply.isEnabled = false
             // Set up each setting item and wait for them to complete
             settingItems.map { settingItem -> settingItem.setup(context) }.joinAll()
             btnApply.isEnabled = false

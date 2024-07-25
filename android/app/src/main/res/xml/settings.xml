@@ -13,6 +13,10 @@
   <item> defines a dropdown option. Attributes include,
     - label: the textual label to be displayed.
     - value: the value to be stored for this option.
+
+  [How to add a setting item]
+  1. Add a new <setting></setting> section in this file.
+  2. Add a string preference key in MainActivity.ky like the existing ones.
 -->
 <Settings>
     <setting
@@ -50,4 +54,18 @@
         dataStoreType="string"
         dataStoreKey="api-key"
         hint="@string/settings_api_key_hint"/>
+    <setting
+        label="@string/settings_auto_recording_start_desc"
+        desc="@string/settings_auto_recording_start_hint"
+        type="dropdown"
+        dataStoreType="bool"
+        dataStoreKey="is-auto-recording-start"
+        default="1">
+        <item
+            label="@string/settings_option_yes"
+            value="true"/>
+        <item
+            label="@string/settings_option_no"
+            value="false"/>
+    </setting>
 </Settings>
