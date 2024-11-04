@@ -55,8 +55,8 @@
         dataStoreKey="api-key"
         hint="@string/settings_api_key_hint"/>
     <setting
-        label="@string/settings_auto_recording_start_desc"
-        desc="@string/settings_auto_recording_start_hint"
+        label="@string/settings_auto_recording_start"
+        desc="@string/settings_auto_recording_start_desc"
         type="dropdown"
         dataStoreType="bool"
         dataStoreKey="is-auto-recording-start"
