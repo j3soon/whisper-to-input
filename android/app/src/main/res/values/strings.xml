@@ -30,6 +30,7 @@
     <string name="settings_request_style">Request Style</string>
     <string name="settings_request_style_desc">Use the official OpenAI API or Whisper Webservice request style.</string>
     <string name="settings_option_openai_api">OpenAI API</string>
+    <string name="settings_option_openai_api_default_endpoint">https://api.openai.com/v1/audio/transcriptions</string>
     <string name="settings_option_whisper_webservice">Whisper Webservice</string>
     <string-array name="settings_request_style_array">
         <item>@string/settings_option_openai_api</item>
