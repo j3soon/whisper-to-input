@@ -27,54 +27,46 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Environment
 import android.provider.*
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.whispertoinput.recorder.RecorderManager
-import com.example.whispertoinput.settings.SettingsPage
-import com.example.whispertoinput.settings.SettingsPageBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.IOException
 
 // 200 and 201 are an arbitrary values, as long as they do not conflict with each other
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 201
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
-val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
-val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
 val API_KEY = stringPreferencesKey("api-key")
+val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
 
 class MainActivity : AppCompatActivity() {
-    private var settingsPage: SettingsPage? = null
+    private var setupSettingItemsDone: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val settingsList: LinearLayout = findViewById(R.id.settings_list)
-        val btnApply: Button = findViewById(R.id.btn_settings_apply)
-        val builder = SettingsPageBuilder(this, btnApply, layoutInflater, settingsList, R.xml.settings)
-        settingsPage = builder.build()
-
+        setupSettingItems()
         checkPermissions()
     }
 
@@ -124,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        var msg: String;
+        var msg: String
 
         // Only handles requests marked with the unique code.
         if (requestCode == MICROPHONE_PERMISSION_REQUEST_CODE) {
@@ -144,4 +136,132 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Below are settings related functions
+    abstract inner class SettingItem() {
+        protected var isDirty: Boolean = false
+        abstract fun setup() : Job
+        abstract suspend fun apply()
+        protected suspend fun <T> readSetting(key: Preferences.Key<T>): T? {
+            // work is moved to `Dispatchers.IO` under the hood
+            // Ref: https://developer.android.com/codelabs/android-preferences-datastore#3
+            return dataStore.data.map { preferences ->
+                preferences[key]
+            }.first()
+        }
+        protected suspend fun <T> writeSetting(key: Preferences.Key<T>, newValue: T) {
+            // work is moved to `Dispatchers.IO` under the hood
+            // Ref: https://developer.android.com/codelabs/android-preferences-datastore#3
+            dataStore.edit { settings ->
+                settings[key] = newValue
+            }
+        }
+    }
+
+    inner class SettingText(
+        private val viewId: Int,
+        private val preferenceKey: Preferences.Key<String>,
+    ): SettingItem() {
+        override fun setup(): Job {
+            return CoroutineScope(Dispatchers.Main).launch {
+                val btnApply: Button = findViewById(R.id.btn_settings_apply)
+                val editText = findViewById<EditText>(viewId)
+                editText.isEnabled = false
+                editText.doOnTextChanged { _, _, _, _ ->
+                    if (!setupSettingItemsDone) return@doOnTextChanged
+                    isDirty = true
+                    btnApply.isEnabled = true
+                }
+
+                // Read data
+                val value: String? = readSetting(preferenceKey)
+                if (!value.isNullOrEmpty()) {
+                    editText.setText(value)
+                }
+                editText.isEnabled = true
+            }
+        }
+        override suspend fun apply() {
+            if (!isDirty) return
+            val newValue: String = findViewById<EditText>(viewId).text.toString()
+            writeSetting(preferenceKey, newValue)
+            isDirty = false
+        }
+    }
+
+    inner class SettingDropdown(
+        private val viewId: Int,
+        private val preferenceKey: Preferences.Key<Boolean>,
+        private val stringToValue: HashMap<String, Boolean>,
+        private val defaultValue: Boolean = true
+    ): SettingItem() {
+        override fun setup(): Job {
+            return CoroutineScope(Dispatchers.Main).launch {
+                val btnApply: Button = findViewById(R.id.btn_settings_apply)
+                val spinner = findViewById<Spinner>(viewId)
+                spinner.isEnabled = false
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
+                        if (!setupSettingItemsDone) return
+                        isDirty = true
+                        btnApply.isEnabled = true
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>) { }
+                }
+
+                val valueToString = stringToValue.map { (k, v) -> v to k }.toMap()
+                // Read data. If none, apply default value.
+                val settingValue: Boolean? = readSetting(preferenceKey)
+                val value: Boolean = settingValue ?: defaultValue
+                val string: String = valueToString[value]!!
+                if (settingValue == null) {
+                    writeSetting(preferenceKey, defaultValue)
+                }
+                val index: Int? = (0 until spinner.adapter.count).firstOrNull {
+                    spinner.adapter.getItem(it) == string
+                }
+                spinner.setSelection(index!!, false)
+                spinner.isEnabled = true
+            }
+        }
+        override suspend fun apply() {
+            if (!isDirty) return
+            val selectedItem = findViewById<Spinner>(viewId).selectedItem
+            val newValue: Boolean = stringToValue[selectedItem]!!
+            writeSetting(preferenceKey, newValue)
+            isDirty = false
+        }
+    }
+
+    private fun setupSettingItems() {
+        setupSettingItemsDone = false
+        CoroutineScope(Dispatchers.Main).launch {
+            val settingItems = arrayOf(
+                SettingDropdown(R.id.spinner_request_style, REQUEST_STYLE, hashMapOf(
+                    getString(R.string.settings_option_openai_api) to true,
+                    getString(R.string.settings_option_whisper_webservice) to false,
+                )),
+                SettingText(R.id.field_endpoint, ENDPOINT),
+                SettingText(R.id.field_language_code, LANGUAGE_CODE),
+                SettingText(R.id.field_api_key, API_KEY),
+                SettingDropdown(R.id.spinner_auto_recording_start, AUTO_RECORDING_START, hashMapOf(
+                    getString(R.string.settings_option_yes) to true,
+                    getString(R.string.settings_option_no) to false,
+                )),
+            )
+            val btnApply: Button = findViewById(R.id.btn_settings_apply)
+            btnApply.isEnabled = false
+            btnApply.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch {
+                    btnApply.isEnabled = false
+                    for (settingItem in settingItems) {
+                        settingItem.apply()
+                    }
+                    btnApply.isEnabled = false
+                }
+                Toast.makeText(this@MainActivity, R.string.successfully_set, Toast.LENGTH_SHORT).show()
+            }
+            settingItems.map { settingItem -> settingItem.setup() }.joinAll()
+            setupSettingItemsDone = true
+        }
+    }
 }
