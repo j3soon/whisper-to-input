@@ -185,9 +185,6 @@ class WhisperInputService : InputMethodService() {
 
     override fun onWindowShown() {
         super.onWindowShown()
-        whisperTranscriber.stop()
-        whisperKeyboard.reset()
-        recorderManager!!.stop()
 
         // If this is the first time calling onWindowShown, it means this IME is just being switched to
         // Automatically starts recording after switching to Whisper Input (if settings enabled)
