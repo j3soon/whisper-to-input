@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
 private const val AUDIO_MEDIA_TYPE = "audio/mp4"
@@ -60,6 +61,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun transcriptionExceptionCallback(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        whisperKeyboard.reset()
     }
 
     override fun onCreateInputView(): View {
@@ -99,7 +101,9 @@ class WhisperInputService : InputMethodService() {
             { onEnter() },
             { onSpaceBar() },
             { onSwitchIme() },
-            { onOpenSettings() })
+            { onOpenSettings() },
+            { shouldShowRetry() },
+        )
     }
 
     private fun onStartRecording() {
@@ -174,6 +178,11 @@ class WhisperInputService : InputMethodService() {
     private fun onSpaceBar() {
         val inputConnection = currentInputConnection ?: return
         inputConnection.commitText(" ", 1)
+    }
+
+    private fun shouldShowRetry(): Boolean {
+        val exists = File(recordedAudioFilename).exists()
+        return exists
     }
 
     // Opens up app MainActivity
