@@ -98,7 +98,11 @@ class WhisperTranscriber {
             val (transcribedText, exceptionMessage) = withContext(Dispatchers.IO) {
                 try {
                     // Perform transcription here
-                    return@withContext Pair(makeWhisperRequest(), null)
+                    val response = makeWhisperRequest()
+                    // Clean up unused audio file after transcription
+                    // Ref: https://developer.android.com/reference/android/media/MediaRecorder#setOutputFile(java.io.File)
+                    File(filename).delete()
+                    return@withContext Pair(response, null)
                 } catch (e: CancellationException) {
                     // Task was canceled
                     return@withContext Pair(null, null)
@@ -115,10 +119,6 @@ class WhisperTranscriber {
                 Log.e(TAG, exceptionMessage)
                 exceptionCallback(exceptionMessage)
             }
-            
-            // Clean up unused audio file after transcription
-            // Ref: https://developer.android.com/reference/android/media/MediaRecorder#setOutputFile(java.io.File)
-            File(filename).delete()
         }
 
         registerTranscriptionJob(job)
