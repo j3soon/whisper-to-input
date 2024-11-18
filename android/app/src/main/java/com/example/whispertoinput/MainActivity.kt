@@ -204,6 +204,14 @@ class MainActivity : AppCompatActivity() {
                         if (!setupSettingItemsDone) return
                         isDirty = true
                         btnApply.isEnabled = true
+                        // Deal with individual spinner
+                        if (parent.id == R.id.spinner_request_style) {
+                            val selectedItem = parent.getItemAtPosition(pos)
+                            if (selectedItem == getString(R.string.settings_option_openai_api)) {
+                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
+                                endpointEditText.setText(getString(R.string.settings_option_openai_api_default_endpoint))
+                            }
+                        }
                     }
                     override fun onNothingSelected(parent: AdapterView<*>) { }
                 }
@@ -234,6 +242,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSettingItems() {
         setupSettingItemsDone = false
+        // Add setting items here to apply functions to them
         CoroutineScope(Dispatchers.Main).launch {
             val settingItems = arrayOf(
                 SettingDropdown(R.id.spinner_request_style, REQUEST_STYLE, hashMapOf(
