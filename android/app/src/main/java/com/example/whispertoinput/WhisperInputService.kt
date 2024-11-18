@@ -211,4 +211,10 @@ class WhisperInputService : InputMethodService() {
         recorderManager!!.stop()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        whisperTranscriber.stop()
+        whisperKeyboard.reset()
+        recorderManager!!.stop()
+    }
 }

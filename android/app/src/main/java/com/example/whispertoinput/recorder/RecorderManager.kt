@@ -32,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.IOException
 
 private const val MEDIA_RECORDER_CONSTRUCTOR_DEPRECATION_API_LEVEL = 31
@@ -68,6 +69,12 @@ class RecorderManager(context: Context) {
             } else {
                 MediaRecorder()
             }
+
+        val file: File = File(filename)
+        if (file.exists()) {
+            file.delete()
+            Log.e("whisper-input", "File should not exist")
+        }
 
         recorder!!.apply {
             setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)

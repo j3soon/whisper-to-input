@@ -57,7 +57,7 @@ class WhisperTranscriber {
             // Retrieve configs
             val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
-            preferences[ENDPOINT] ?: "",
+                    preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "en",
                     preferences[REQUEST_STYLE] ?: true,
                     preferences[API_KEY] ?: ""
@@ -115,6 +115,10 @@ class WhisperTranscriber {
                 Log.e(TAG, exceptionMessage)
                 exceptionCallback(exceptionMessage)
             }
+            
+            // Clean up unused audio file after transcription
+            // Ref: https://developer.android.com/reference/android/media/MediaRecorder#setOutputFile(java.io.File)
+            File(filename).delete()
         }
 
         registerTranscriptionJob(job)
