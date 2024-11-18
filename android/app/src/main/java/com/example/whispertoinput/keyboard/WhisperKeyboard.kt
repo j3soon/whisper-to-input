@@ -58,6 +58,7 @@ class WhisperKeyboard {
     private var onOpenSettings: () -> Unit = { }
     private var onEnter: () -> Unit = { }
     private var onSpaceBar: () -> Unit = { }
+    private var shouldShowRetry: () -> Boolean = { false }
 
     // Keyboard Status
     private var keyboardStatus: KeyboardStatus = KeyboardStatus.Idle
@@ -67,6 +68,7 @@ class WhisperKeyboard {
     private var buttonMic: ImageButton? = null
     private var buttonEnter: ImageButton? = null
     private var buttonCancel: ImageButton? = null
+    private var buttonRetry: ImageButton? = null
     private var labelStatus: TextView? = null
     private var buttonSpaceBar: ImageButton? = null
     private var waitingIcon: ProgressBar? = null
@@ -87,13 +89,15 @@ class WhisperKeyboard {
         onEnter: () -> Unit,
         onSpaceBar: () -> Unit,
         onSwitchIme: () -> Unit,
-        onOpenSettings: () -> Unit
+        onOpenSettings: () -> Unit,
+        shouldShowRetry: () -> Boolean,
     ): View {
         // Inflate the keyboard layout & assign views
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as ConstraintLayout
         buttonMic = keyboardView!!.findViewById(R.id.btn_mic) as ImageButton
         buttonEnter = keyboardView!!.findViewById(R.id.btn_enter) as ImageButton
         buttonCancel = keyboardView!!.findViewById(R.id.btn_cancel) as ImageButton
+        buttonRetry = keyboardView!!.findViewById(R.id.btn_retry) as ImageButton
         labelStatus = keyboardView!!.findViewById(R.id.label_status) as TextView
         buttonSpaceBar = keyboardView!!.findViewById(R.id.btn_space_bar) as ImageButton
         waitingIcon = keyboardView!!.findViewById(R.id.pb_waiting_icon) as ProgressBar
@@ -117,6 +121,7 @@ class WhisperKeyboard {
         buttonMic!!.setOnClickListener { onButtonMicClick() }
         buttonEnter!!.setOnClickListener { onButtonEnterClick() }
         buttonCancel!!.setOnClickListener { onButtonCancelClick() }
+        buttonRetry!!.setOnClickListener { onButtonRetryClick() }
         buttonSettings!!.setOnClickListener { onButtonSettingsClick() }
         buttonBackspace!!.setBackspaceCallback { onButtonBackspaceClick() }
         buttonSpaceBar!!.setOnClickListener { onButtonSpaceBarClick() }
@@ -135,6 +140,7 @@ class WhisperKeyboard {
         this.onOpenSettings = onOpenSettings
         this.onEnter = onEnter
         this.onSpaceBar = onSpaceBar
+        this.shouldShowRetry = shouldShowRetry
 
         // Resets keyboard upon setup
         reset()
@@ -269,17 +275,24 @@ class WhisperKeyboard {
         }
     }
 
-    private fun setKeyboardStatus(newStatus: KeyboardStatus) {
-        if (keyboardStatus == newStatus) {
-            return
+    private fun onButtonRetryClick() {
+        // Upon button retry click.
+        // Idle -> Retry
+        // else -> nothing
+        if (keyboardStatus == KeyboardStatus.Idle) {
+            setKeyboardStatus(KeyboardStatus.Transcribing)
+            onStartTranscribing("")
         }
+    }
 
+    private fun setKeyboardStatus(newStatus: KeyboardStatus) {
         when (newStatus) {
             KeyboardStatus.Idle -> {
                 labelStatus!!.setText(R.string.whisper_to_input)
                 buttonMic!!.setImageResource(R.drawable.mic_idle)
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.INVISIBLE
+                buttonRetry!!.visibility = if (shouldShowRetry()) View.VISIBLE else View.INVISIBLE
                 micRippleContainer!!.visibility = View.GONE
                 keyboardView!!.keepScreenOn = false
             }
@@ -289,6 +302,7 @@ class WhisperKeyboard {
                 buttonMic!!.setImageResource(R.drawable.mic_pressed)
                 waitingIcon!!.visibility = View.INVISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
+                buttonRetry!!.visibility = View.INVISIBLE
                 micRippleContainer!!.visibility = View.VISIBLE
                 keyboardView!!.keepScreenOn = true
             }
@@ -298,6 +312,7 @@ class WhisperKeyboard {
                 buttonMic!!.setImageResource(R.drawable.mic_transcribing)
                 waitingIcon!!.visibility = View.VISIBLE
                 buttonCancel!!.visibility = View.VISIBLE
+                buttonRetry!!.visibility = View.INVISIBLE
                 micRippleContainer!!.visibility = View.GONE
                 keyboardView!!.keepScreenOn = true
             }
