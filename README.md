@@ -101,6 +101,19 @@ See [the adb doc](https://developer.android.com/tools/logcat) for more info.
 
 Please [open an issue](https://github.com/j3soon/whisper-to-input/issues) if you have any questions.
 
+## Developer Notes
+
+To build and release a newer version, open Android Studio and follow the steps below:
+
+1. Bump the version code and version name.
+2. Retrieve signing keystore and its password from [Johnson](https://github.com/j3soon).
+3. Menu: `Build > Generate Signed App Bundle / APK...`
+4. Select `APK`, and fill in the signing keystore path and password, and select `Debug` in the next step to build.
+5. Rename the file `whisper-to-input/android/app/build/outputs/apk/debug/app-debug.apk` accordingly.
+6. Create Git tag and release on GitHub.
+
+See [the official document](https://developer.android.com/studio/publish/app-signing#sign_release) for more information.
+
 ## License
 
 This repository is licensed under the GPLv3 license. For more information, please refer to the [LICENSE](android/LICENSE) file.
