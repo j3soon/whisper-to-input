@@ -160,6 +160,7 @@ class MainActivity : AppCompatActivity() {
     inner class SettingText(
         private val viewId: Int,
         private val preferenceKey: Preferences.Key<String>,
+        private val defaultValue: String = ""
     ): SettingItem() {
         override fun setup(): Job {
             return CoroutineScope(Dispatchers.Main).launch {
@@ -172,11 +173,13 @@ class MainActivity : AppCompatActivity() {
                     btnApply.isEnabled = true
                 }
 
-                // Read data
-                val value: String? = readSetting(preferenceKey)
-                if (!value.isNullOrEmpty()) {
-                    editText.setText(value)
+                // Read data. If none, apply default value.
+                val settingValue: String? = readSetting(preferenceKey)
+                val value: String = settingValue ?: defaultValue
+                if (settingValue == null) {
+                    writeSetting(preferenceKey, defaultValue)
                 }
+                editText.setText(value)
                 editText.isEnabled = true
             }
         }
@@ -249,7 +252,7 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.settings_option_openai_api) to true,
                     getString(R.string.settings_option_whisper_webservice) to false,
                 )),
-                SettingText(R.id.field_endpoint, ENDPOINT),
+                SettingText(R.id.field_endpoint, ENDPOINT, getString(R.string.settings_option_openai_api_default_endpoint)),
                 SettingText(R.id.field_language_code, LANGUAGE_CODE),
                 SettingText(R.id.field_api_key, API_KEY),
                 SettingDropdown(R.id.spinner_auto_recording_start, AUTO_RECORDING_START, hashMapOf(
