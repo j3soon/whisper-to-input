@@ -1,6 +1,6 @@
 package com.example.whisperkeyboard
 
-import android1.inputmethodservice.InputMethodService
+import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView
 import android.view.View
