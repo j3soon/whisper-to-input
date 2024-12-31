@@ -1,0 +1,32 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "main" ]  # or whichever branch you're using
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out code
+      - uses: actions/checkout@v3
+
+      # Step 2: Set up Java
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"  # or "11" if that's what you use
+
+      # Step 3: Build with Gradle
+      - name: Build
+        run: |
+          ./gradlew assembleDebug
+
+      # Step 4: Upload APK as an artifact (optional, but useful to download and install)
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: BuiltAPK
+          path: app/build/outputs/apk/debug/*.apk
