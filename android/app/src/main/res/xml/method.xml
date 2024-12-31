@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<input-method xmlns:android="http://schemas.android.com/apk/res/android"
-    android:supportsSwitchingToNextInputMethod="true">
-    <subtype android:imeSubtypeMode="keyboard" />
+<input-method
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.example.whisperkeyboard.MainActivity" >
 </input-method>
