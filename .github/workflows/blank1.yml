@@ -1,0 +1,32 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the repo
+      - uses: actions/checkout@v3
+
+      # Step 2: Set up Java (needs distribution specified)
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'   # REQUIRED: e.g. 'temurin', 'zulu', etc.
+          java-version: '17'       # or '11', '8', etc.
+
+      # Step 3: Build your Android project using Gradle
+      - name: Build with Gradle
+        run: |
+          ./gradlew assembleDebug
+
+      # Step 4: Upload the generated APK as an artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: BuiltAPK
+          path: app/build/outputs/apk/debug/*.apk
