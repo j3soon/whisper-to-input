@@ -14,7 +14,7 @@
     </style>
 
     <style name="Background">
-        <item name="android:background">@color/theme_light_yellow</item>
+        <item name="android:background">@color/theme_light_grey</item>
     </style>
 
     <style name="TopBar">
