@@ -58,7 +58,7 @@ class WhisperTranscriber {
             val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
-                    preferences[LANGUAGE_CODE] ?: "en",
+                    preferences[LANGUAGE_CODE] ?: "auto",
                     preferences[REQUEST_STYLE] ?: true,
                     preferences[API_KEY] ?: ""
                 )
