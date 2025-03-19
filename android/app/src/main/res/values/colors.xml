@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dark_gray">#FF777777</color>
-    <color name="theme_light_yellow">#FFF9FBB2</color>
+    <color name="theme_light_grey">#d9d9d9</color>
     <color name="theme_rich_black">#FF001A23</color>
 </resources>
