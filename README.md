@@ -22,7 +22,7 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
    <img src='docs/images/06-record-audio-permission.jpg' width='200'>
    <!-- TODO: Add send notification permission screenshot -->
 
-5. Go to the app settings page and enter your configuration. You have 2 choices, either using the official OpenAI API with [your API key](https://platform.openai.com/api-keys) or self-host a [Whisper ASR Service](https://github.com/ahmetoner/whisper-asr-webservice) as described in [#13](https://github.com/j3soon/whisper-to-input/pull/13).
+5. Go to the app settings page and enter your configuration. You have 2 choices, either using the official OpenAI API with [your API key](https://platform.openai.com/api-keys) or self-host a [Whisper ASR Service](https://github.com/ahmetoner/whisper-asr-webservice). For more information, see the [Services](#services) section.
 
    <img src='docs/images/08-app-settings-page.jpg' width='200'>
 
@@ -34,6 +34,7 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
      Endpoint:      https://api.openai.com/v1/audio/transcriptions
      Language Code:
      API Key:       sk-...xxxx
+     Model:         whisper-1
      ```
    - Whisper ASR Service:
      ```
@@ -41,6 +42,15 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
      Endpoint:      http://<SERVER_IP>:9000/asr
      Language Code:
      API Key:
+     Model:
+     ```
+   - NVIDIA NIM:
+     ```
+     Request Style: NVIDIA NIM
+     Endpoint:      http://<SERVER_IP>:9000/v1/audio/transcriptions
+     Language Code: multi
+     API Key:
+     Model:
      ```
 
 6. Go to the system settings page and enable the app keyboard. This process may vary depending on your Android version and phone model. The following screenshots are taken on Android 13 of a Asus Zenfone 8.
@@ -71,6 +81,141 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
 - `Enter Key` in the bottom right: Input a newline character. If you press this while recording, it will stop recording and input the recognized text with a trailing newline.
 - `Settings Key` in the upper left: Open the app settings page.
 - `Switch Key` in the upper left: Switch to the previous input method. Note that if there were no previous input method, this key will not do anything.
+
+## Services
+
+Either one of the following service can be used as the STT/ASR backend.
+
+### OpenAI API
+
+Requires an [OpenAI API key](https://platform.openai.com/api-keys).
+
+See the [documentation](https://platform.openai.com/docs/guides/speech-to-text?lang=curl) for more info.
+
+### Whisper ASR Service
+
+The most commonly used open-source self-host whisper service. Requires a self-hosted server.
+
+[Whisper ASR Service](https://github.com/ahmetoner/whisper-asr-webservice) can be set up as described in [#13](https://github.com/j3soon/whisper-to-input/pull/13).
+
+### NVIDIA NIM (Self-hosted)
+
+NVIDIA's optimized whisper model using TensorRT-LLM. Requires a self-hosted server.
+
+Use the [openai/whisper-large-v3](https://build.nvidia.com/openai/whisper-large-v3) NIM by following [the deployment guide](https://build.nvidia.com/openai/whisper-large-v3/deploy). After generating a NGC API key, run:
+
+```sh
+export NGC_API_KEY=<PASTE_API_KEY_HERE>
+export LOCAL_NIM_CACHE=~/.cache/nim
+mkdir -p "$LOCAL_NIM_CACHE"
+
+docker run -it --rm --name=riva-asr \
+   --runtime=nvidia \
+   --gpus '"device=0"' \
+   --shm-size=8GB \
+   -e NGC_API_KEY \
+   -e NIM_HTTP_API_PORT=9000 \
+   -e NIM_GRPC_API_PORT=50051 \
+   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
+   -u $(id -u) \
+   -p 9000:9000 \
+   -p 50051:50051 \
+   -e NIM_TAGS_SELECTOR=name=whisper-large-v3 \
+   nvcr.io/nim/nvidia/riva-asr:1.3.0
+```
+
+and wait for a while. It should show the following when launched successfully:
+
+```
+INFO:uvicorn.error:Uvicorn running on http://0.0.0.0:9000 (Press CTRL+C to quit)
+```
+
+Perform a health check:
+
+```sh
+curl -X 'GET' 'http://localhost:9000/v1/health/ready'
+```
+
+this should show:
+
+```
+{"ready":true}
+```
+
+Download a sample audio:
+
+```sh
+# MP3 will not work, use wav instead.
+wget https://github.com/audio-samples/audio-samples.github.io/raw/refs/heads/master/samples/wav/ted_speakers/BillGates/sample-0.wav
+```
+
+Then test it:
+
+```sh
+curl --request POST \
+  --url http://localhost:9000/v1/audio/transcriptions \
+  --header 'Content-Type: multipart/form-data' \
+  --form file=@./sample-0.wav \
+  --form language=multi
+```
+
+this should show:
+
+```
+{"text":"A cramp is no small danger on a swim. "}
+```
+
+The following Python package is used in the official guide, but isn't required. We still include these instructions here for reference:
+
+```sh
+sudo apt-get install python3-pip
+pip install nvidia-riva-client
+git clone https://github.com/nvidia-riva/python-clients.git
+```
+
+and
+
+```sh
+python3 python-clients/scripts/asr/transcribe_file_offline.py --server 0.0.0.0:50051 --input-file ./sample-0.wav --language-code multi
+```
+
+will show something like:
+
+```
+{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "a cramp is no small danger on a swim ",
+          "confidence": 0.0,
+          "words": [],
+          "languageCode": []
+        }
+      ],
+      "channelTag": 1,
+      "audioProcessed": 2.84625
+    }
+  ],
+  "id": {
+    "value": "dc98a7d8-487a-4825-bf3c-6f9621914246"
+  }
+}
+Final transcript: a cramp is no small danger on a swim 
+```
+
+and
+
+```sh
+python3 python-clients/scripts/asr/transcribe_file_offline.py --list-models
+```
+
+will show:
+
+```
+Available ASR models
+{'en,zh,de,es,ru,ko,fr,ja,pt,tr,pl,ca,nl,ar,sv,it,id,hi,fi,vi,he,uk,el,ms,cs,ro,da,hu,ta,no,th,ur,hr,bg,lt,la,mi,ml,cy,sk,te,fa,lv,bn,sr,az,sl,kn,et,mk,br,eu,is,hy,ne,mn,bs,kk,sq,sw,gl,mr,pa,si,km,sn,yo,so,af,oc,ka,be,tg,sd,gu,am,yi,lo,uz,fo,ht,ps,tk,nn,mt,sa,lb,my,bo,tl,mg,as,tt,haw,ln,ha,ba,jw,su,yue,multi': [{'model': ['whisper-large-v3-multi-asr-offline-asr-bls-ensemble']}]}
+```
 
 ## Debugging
 

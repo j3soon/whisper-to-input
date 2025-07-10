@@ -33,9 +33,15 @@
     <string name="settings_option_openai_api_default_endpoint">https://api.openai.com/v1/audio/transcriptions</string>
     <string name="settings_option_openai_api_default_model">whisper-1</string>
     <string name="settings_option_whisper_webservice">Whisper Webservice</string>
+    <string name="settings_option_whisper_webservice_default_endpoint">http://localhost:9000/asr</string>
+    <string name="settings_option_whisper_webservice_default_model"></string> <!-- Empty default model -->
+    <string name="settings_option_nvidia_nim">NVIDIA NIM</string>
+    <string name="settings_option_nvidia_nim_default_endpoint">http://localhost:9000/v1/audio/transcriptions</string>
+    <string name="settings_option_nvidia_nim_default_model">multi</string>
     <string-array name="settings_request_style_array">
         <item>@string/settings_option_openai_api</item>
         <item>@string/settings_option_whisper_webservice</item>
+        <item>@string/settings_option_nvidia_nim</item>
     </string-array>
     <string name="settings_endpoint">Endpoint</string>
     <string name="settings_endpoint_desc">The host and port for the OpenAI API or Whisper Webservice endpoint.</string>

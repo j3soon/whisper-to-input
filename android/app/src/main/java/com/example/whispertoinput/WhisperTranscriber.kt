@@ -39,7 +39,7 @@ class WhisperTranscriber {
     private data class Config(
         val endpoint: String,
         val languageCode: String,
-        val isRequestStyleOpenaiApi: Boolean,
+        val requestStyle: String,
         val apiKey: String,
         val model: String,
         val postprocessing: String
@@ -58,11 +58,11 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey, model, postprocessing) = context.dataStore.data.map { preferences: Preferences ->
+            val (endpoint, languageCode, requestStyle, apiKey, model, postprocessing) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "auto",
-                    preferences[REQUEST_STYLE] ?: true,
+                    preferences[REQUEST_STYLE] ?: context.getString(R.string.settings_option_openai_api),
                     preferences[API_KEY] ?: "",
                     preferences[MODEL] ?: "",
                     preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion)
@@ -82,7 +82,7 @@ class WhisperTranscriber {
                 "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt",
                 mediaType,
                 apiKey,
-                isRequestStyleOpenaiApi,
+                requestStyle,
                 model
             )
             val response = client.newCall(request).execute()
@@ -152,28 +152,32 @@ class WhisperTranscriber {
         url: String,
         mediaType: String,
         apiKey: String,
-        isRequestStyleOpenaiApi: Boolean,
+        requestStyle: String,
         model: String
     ): Request {
         // Please refer to the following for the endpoint/payload definitions:
         // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
         // - https://platform.openai.com/docs/api-reference/audio/createTranscription
         // - https://platform.openai.com/docs/api-reference/making-requests
+        // - NVIDIA NIM doesn't have documentation for HTTP-style requests.
         val file: File = File(filename)
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
             setType(MultipartBody.FORM)
-            if (!isRequestStyleOpenaiApi) {
-                addFormDataPart("audio_file", "@audio.m4a", fileBody)
-            } else {
+            if (requestStyle == context.getString(R.string.settings_option_openai_api) || 
+                requestStyle == context.getString(R.string.settings_option_nvidia_nim)) {
                 addFormDataPart("file", "@audio.m4a", fileBody)
+            } else if (requestStyle == context.getString(R.string.settings_option_whisper_webservice)) {
+                addFormDataPart("audio_file", "@audio.m4a", fileBody)
+            }
+            if (requestStyle == context.getString(R.string.settings_option_openai_api)) {
                 addFormDataPart("model", model)
                 addFormDataPart("response_format", "text")
             }
         }.build()
 
         val requestHeaders: Headers = Headers.Builder().apply {
-            if (isRequestStyleOpenaiApi) {
+            if (requestStyle == context.getString(R.string.settings_option_openai_api)) {
                 // Foolproof message
                 if (apiKey == "") {
                     throw Exception(context.getString(R.string.error_apikey_unset))
