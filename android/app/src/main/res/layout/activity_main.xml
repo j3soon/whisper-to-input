@@ -113,20 +113,6 @@
                 style="@style/SettingsField"
                 android:hint="@string/settings_endpoint_hint" />
 
-            <!-- Language Code -->
-            <TextView
-                android:id="@+id/label_language_code"
-                style="@style/SettingsLabel"
-                android:text="@string/settings_language_code" />
-            <TextView
-                android:id="@+id/description_language_code"
-                style="@style/SettingsDescription"
-                android:text="@string/settings_language_code_desc" />
-            <EditText
-                android:id="@+id/field_language_code"
-                style="@style/SettingsField"
-                android:hint="@string/settings_language_code_hint" />
-
             <!-- API Key -->
             <TextView
                 android:id="@+id/label_api_key"
@@ -154,6 +140,20 @@
                 android:id="@+id/field_model"
                 style="@style/SettingsField"
                 android:hint="@string/settings_model_hint" />
+
+            <!-- Language Code -->
+            <TextView
+                android:id="@+id/label_language_code"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_language_code" />
+            <TextView
+                android:id="@+id/description_language_code"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_language_code_desc" />
+            <EditText
+                android:id="@+id/field_language_code"
+                style="@style/SettingsField"
+                android:hint="@string/settings_language_code_hint" />
 
             <!-- Auto Recording Start -->
             <TextView
