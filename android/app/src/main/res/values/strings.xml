@@ -27,18 +27,26 @@
     <!-- Settings -->
     <string name="whisper_to_input_settings_title">Whisper To Input Settings</string>
     <string name="settings_btn_apply">Apply</string>
-    <string name="settings_request_style">Request Style</string>
-    <string name="settings_request_style_desc">Use the official OpenAI API or Whisper Webservice request style.</string>
+    <string name="settings_speech_to_text_backend">Speech to Text Backend</string>
+    <string name="settings_speech_to_text_backend_desc">Use the official OpenAI API, Whisper ASR Webservice, or NVIDIA NIM backend.</string>
     <string name="settings_option_openai_api">OpenAI API</string>
     <string name="settings_option_openai_api_default_endpoint">https://api.openai.com/v1/audio/transcriptions</string>
     <string name="settings_option_openai_api_default_model">whisper-1</string>
-    <string name="settings_option_whisper_webservice">Whisper Webservice</string>
-    <string-array name="settings_request_style_array">
+    <string name="settings_option_openai_api_default_language">auto</string>
+    <string name="settings_option_whisper_asr_webservice">Whisper ASR Webservice</string>
+    <string name="settings_option_whisper_asr_webservice_default_endpoint">http://localhost:9000/asr</string>
+    <string name="settings_option_whisper_asr_webservice_default_model"></string> <!-- Empty default model -->
+    <string name="settings_option_nvidia_nim">NVIDIA NIM</string>
+    <string name="settings_option_nvidia_nim_default_endpoint">http://localhost:9000/v1/audio/transcriptions</string>
+    <string name="settings_option_nvidia_nim_default_model"></string> <!-- Empty default model -->
+    <string name="settings_option_nvidia_nim_default_language">multi</string> <!-- Empty default language -->
+    <string-array name="settings_speech_to_text_backend_array">
         <item>@string/settings_option_openai_api</item>
-        <item>@string/settings_option_whisper_webservice</item>
+        <item>@string/settings_option_whisper_asr_webservice</item>
+        <item>@string/settings_option_nvidia_nim</item>
     </string-array>
     <string name="settings_endpoint">Endpoint</string>
-    <string name="settings_endpoint_desc">The host and port for the OpenAI API or Whisper Webservice endpoint.</string>
+    <string name="settings_endpoint_desc">The host and port for the OpenAI API, Whisper ASR Webservice, or NVIDIA NIM endpoint.</string>
     <string name="settings_endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
     <string name="settings_language_code">Language Code</string>
     <string name="settings_language_code_desc">The language code to be included in the request payload (e.g., en, zh).</string>

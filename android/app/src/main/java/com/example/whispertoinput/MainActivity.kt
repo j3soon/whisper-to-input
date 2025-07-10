@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 201
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
+val SPEECH_TO_TEXT_BACKEND = stringPreferencesKey("speech-to-text-backend")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val API_KEY = stringPreferencesKey("api-key")
@@ -209,16 +209,6 @@ class MainActivity : AppCompatActivity() {
                         if (!setupSettingItemsDone) return
                         isDirty = true
                         btnApply.isEnabled = true
-                        // Deal with individual spinner
-                        if (parent.id == R.id.spinner_request_style) {
-                            val selectedItem = parent.getItemAtPosition(pos)
-                            if (selectedItem == getString(R.string.settings_option_openai_api)) {
-                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
-                                endpointEditText.setText(getString(R.string.settings_option_openai_api_default_endpoint))
-                                val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
-                                modelEditText.setText(getString(R.string.settings_option_openai_api_default_model))
-                            }
-                        }
                     }
                     override fun onNothingSelected(parent: AdapterView<*>) { }
                 }
@@ -263,6 +253,38 @@ class MainActivity : AppCompatActivity() {
                         if (!setupSettingItemsDone) return
                         isDirty = true
                         btnApply.isEnabled = true
+                        // Deal with individual spinner
+                        if (parent.id == R.id.spinner_speech_to_text_backend) {
+                            val selectedItem = parent.getItemAtPosition(pos)
+                            if (selectedItem == getString(R.string.settings_option_openai_api)) {
+                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
+                                endpointEditText.setText(getString(R.string.settings_option_openai_api_default_endpoint))
+                                val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
+                                modelEditText.setText(getString(R.string.settings_option_openai_api_default_model))
+                            } else if (selectedItem == getString(R.string.settings_option_whisper_asr_webservice)) {
+                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
+                                if (endpointEditText.text.isEmpty() ||
+                                    endpointEditText.text.toString() == getString(R.string.settings_option_openai_api_default_endpoint) ||
+                                    endpointEditText.text.toString() == getString(R.string.settings_option_nvidia_nim_default_endpoint)
+                                ) {
+                                    endpointEditText.setText(getString(R.string.settings_option_whisper_asr_webservice_default_endpoint))
+                                }
+                                val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
+                                modelEditText.setText(getString(R.string.settings_option_whisper_asr_webservice_default_model))
+                            } else if (selectedItem == getString(R.string.settings_option_nvidia_nim)) {
+                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
+                                if (endpointEditText.text.isEmpty() ||
+                                    endpointEditText.text.toString() == getString(R.string.settings_option_openai_api_default_endpoint) ||
+                                    endpointEditText.text.toString() == getString(R.string.settings_option_whisper_asr_webservice_default_endpoint)
+                                ) {
+                                    endpointEditText.setText(getString(R.string.settings_option_nvidia_nim_default_endpoint))
+                                }
+                                val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
+                                modelEditText.setText(getString(R.string.settings_option_nvidia_nim_default_model))
+                                val languageCodeEditText: EditText = findViewById<EditText>(R.id.field_language_code)
+                                languageCodeEditText.setText(getString(R.string.settings_option_nvidia_nim_default_language))
+                            }
+                        }
                     }
                     override fun onNothingSelected(parent: AdapterView<*>) { }
                 }
@@ -294,12 +316,13 @@ class MainActivity : AppCompatActivity() {
         // Add setting items here to apply functions to them
         CoroutineScope(Dispatchers.Main).launch {
             val settingItems = arrayOf(
-                SettingDropdown(R.id.spinner_request_style, REQUEST_STYLE, hashMapOf(
-                    getString(R.string.settings_option_openai_api) to true,
-                    getString(R.string.settings_option_whisper_webservice) to false,
-                )),
+                SettingStringDropdown(R.id.spinner_speech_to_text_backend, SPEECH_TO_TEXT_BACKEND, listOf(
+                    getString(R.string.settings_option_openai_api),
+                    getString(R.string.settings_option_whisper_asr_webservice),
+                    getString(R.string.settings_option_nvidia_nim)
+                ), getString(R.string.settings_option_openai_api)),
                 SettingText(R.id.field_endpoint, ENDPOINT, getString(R.string.settings_option_openai_api_default_endpoint)),
-                SettingText(R.id.field_language_code, LANGUAGE_CODE),
+                SettingText(R.id.field_language_code, LANGUAGE_CODE, getString(R.string.settings_option_openai_api_default_language)),
                 SettingText(R.id.field_api_key, API_KEY),
                 SettingText(R.id.field_model, MODEL, getString(R.string.settings_option_openai_api_default_model)),
                 SettingDropdown(R.id.spinner_auto_recording_start, AUTO_RECORDING_START, hashMapOf(
@@ -307,9 +330,9 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.settings_option_no) to false,
                 )),
                 SettingStringDropdown(R.id.spinner_postprocessing, POSTPROCESSING, listOf(
-                    getString(R.string.settings_option_no_conversion),
+                    getString(R.string.settings_option_to_traditional),
                     getString(R.string.settings_option_to_simplified),
-                    getString(R.string.settings_option_to_traditional)
+                    getString(R.string.settings_option_no_conversion)
                 ), getString(R.string.settings_option_to_traditional)),
             )
             val btnApply: Button = findViewById(R.id.btn_settings_apply)

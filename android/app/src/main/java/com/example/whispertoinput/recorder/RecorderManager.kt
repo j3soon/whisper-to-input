@@ -57,7 +57,7 @@ class RecorderManager(context: Context) {
             context.resources.getInteger(R.integer.recorder_amplitude_report_period).toLong()
     }
 
-    fun start(context: Context, filename: String) {
+    fun start(context: Context, filename: String, useOggFormat: Boolean = false) {
         recorder?.apply {
             stop()
             release()
@@ -78,9 +78,18 @@ class RecorderManager(context: Context) {
 
         recorder!!.apply {
             setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            if (useOggFormat) {
+                // Use the OGG and OPUS encoder following the recommendation in NVIDIA Riva
+                // Ref: https://docs.nvidia.com/deeplearning/riva/user-guide/docs/reference/protos/riva_audio.proto.html
+                // This format and encoder is the only one supported by both NVIDIA Riva and MediaRecorder.
+                setOutputFormat(MediaRecorder.OutputFormat.OGG)
+                setAudioEncoder(MediaRecorder.AudioEncoder.OPUS)
+            } else {
+                // Use M4A format for other backends
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            }
             setOutputFile(filename)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
             try {
                 prepare()

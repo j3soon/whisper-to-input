@@ -85,19 +85,19 @@
             android:minHeight="100dp"
             android:orientation="vertical" >
 
-            <!-- Request Style -->
+            <!-- Speech to Text Backend -->
             <TextView
-                android:id="@+id/label_request_style"
+                android:id="@+id/label_speech_to_text_backend"
                 style="@style/SettingsLabel"
-                android:text="@string/settings_request_style" />
+                android:text="@string/settings_speech_to_text_backend" />
             <TextView
-                android:id="@+id/description_request_style"
+                android:id="@+id/description_speech_to_text_backend"
                 style="@style/SettingsDescription"
-                android:text="@string/settings_request_style_desc" />
+                android:text="@string/settings_speech_to_text_backend_desc" />
             <Spinner
-                android:id="@+id/spinner_request_style"
+                android:id="@+id/spinner_speech_to_text_backend"
                 style="@style/SettingsSpinner"
-                android:entries="@array/settings_request_style_array" />
+                android:entries="@array/settings_speech_to_text_backend_array" />
 
             <!-- Endpoint -->
             <TextView
@@ -112,20 +112,6 @@
                 android:id="@+id/field_endpoint"
                 style="@style/SettingsField"
                 android:hint="@string/settings_endpoint_hint" />
-
-            <!-- Language Code -->
-            <TextView
-                android:id="@+id/label_language_code"
-                style="@style/SettingsLabel"
-                android:text="@string/settings_language_code" />
-            <TextView
-                android:id="@+id/description_language_code"
-                style="@style/SettingsDescription"
-                android:text="@string/settings_language_code_desc" />
-            <EditText
-                android:id="@+id/field_language_code"
-                style="@style/SettingsField"
-                android:hint="@string/settings_language_code_hint" />
 
             <!-- API Key -->
             <TextView
@@ -154,6 +140,20 @@
                 android:id="@+id/field_model"
                 style="@style/SettingsField"
                 android:hint="@string/settings_model_hint" />
+
+            <!-- Language Code -->
+            <TextView
+                android:id="@+id/label_language_code"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_language_code" />
+            <TextView
+                android:id="@+id/description_language_code"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_language_code_desc" />
+            <EditText
+                android:id="@+id/field_language_code"
+                style="@style/SettingsField"
+                android:hint="@string/settings_language_code_hint" />
 
             <!-- Auto Recording Start -->
             <TextView
