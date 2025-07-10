@@ -2,6 +2,8 @@
 
 Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an Android keyboard that performs speech-to-text (STT/ASR) with OpenAI Whisper and input the recognized text; Supports English, Chinese, Japanese, etc. and even mixed languages and Taiwanese.
 
+The STT/ASR backend service can be either [OpenAI API](https://platform.openai.com/docs/guides/speech-to-text), [Whisper ASR Webservice](https://github.com/ahmetoner/whisper-asr-webservice), or [NVIDIA NIM](https://build.nvidia.com/openai/whisper-large-v3) (based on [NVIDIA Riva](https://docs.nvidia.com/deeplearning/riva/user-guide/docs/index.html)).
+
 ## Installation
 
 1. Download the APK file from [the latest release](https://github.com/j3soon/whisper-to-input/releases/latest) to your phone.
@@ -69,6 +71,8 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
    <img src='docs/images/17-choose-input-method.jpg' width='200'>
    <img src='docs/images/18-app-keyboard.jpg' width='200'>
 
+   > Please note that the keyboard GUI will look slightly different than the screenshots due to the fixes in [#50](https://github.com/j3soon/whisper-to-input/pull/50).
+
 8. Click the microphone button to start recording. After you finish speaking, click the microphone button again. The recognized text will be inputted into the text box.
 
 ## Keyboard Usage
@@ -102,7 +106,7 @@ The most commonly used open-source self-host whisper service. Requires a self-ho
 
 NVIDIA's optimized whisper model using TensorRT-LLM. Requires a self-hosted server.
 
-Use the [openai/whisper-large-v3](https://build.nvidia.com/openai/whisper-large-v3) NIM by following [the deployment guide](https://build.nvidia.com/openai/whisper-large-v3/deploy). After generating a NGC API key, run:
+Use the [openai/whisper-large-v3 NIM](https://build.nvidia.com/openai/whisper-large-v3) by following [the deployment guide](https://build.nvidia.com/openai/whisper-large-v3/deploy). After generating a NGC API key, run:
 
 ```sh
 export NGC_API_KEY=<PASTE_API_KEY_HERE>

@@ -61,7 +61,7 @@ class WhisperTranscriber {
             val (endpoint, languageCode, speechToTextBackend, apiKey, model, postprocessing) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
-                    preferences[LANGUAGE_CODE] ?: "auto",
+                    preferences[LANGUAGE_CODE] ?: "",
                     preferences[SPEECH_TO_TEXT_BACKEND] ?: context.getString(R.string.settings_option_openai_api),
                     preferences[API_KEY] ?: "",
                     preferences[MODEL] ?: "",
