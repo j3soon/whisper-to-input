@@ -156,7 +156,8 @@ curl --request POST \
   --url http://localhost:9000/v1/audio/transcriptions \
   --header 'Content-Type: multipart/form-data' \
   --form file=@./sample-0.wav \
-  --form language=multi
+  --form language=multi \
+  --form response_format=text
 ```
 
 this should show:

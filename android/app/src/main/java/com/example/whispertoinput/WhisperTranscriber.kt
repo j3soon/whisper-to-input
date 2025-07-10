@@ -184,12 +184,15 @@ class WhisperTranscriber {
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
             setType(MultipartBody.FORM)
+            // Determine filename based on media type
+            val formDataFilename = if (mediaType == "audio/ogg") "@audio.ogg" else "@audio.m4a"
+            
             // Add file to payload
             if (speechToTextBackend == context.getString(R.string.settings_option_openai_api) || 
                 speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim)) {
-                addFormDataPart("file", "@audio.m4a", fileBody)
+                addFormDataPart("file", formDataFilename, fileBody)
             } else if (speechToTextBackend == context.getString(R.string.settings_option_whisper_asr_webservice)) {
-                addFormDataPart("audio_file", "@audio.m4a", fileBody)
+                addFormDataPart("audio_file", formDataFilename, fileBody)
             }
             // Add backend-specific parameters to payload
             if (speechToTextBackend == context.getString(R.string.settings_option_openai_api)) {

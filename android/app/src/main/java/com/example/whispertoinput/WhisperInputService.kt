@@ -41,8 +41,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-private const val RECORDED_AUDIO_FILENAME = "recorded.m4a"
-private const val AUDIO_MEDIA_TYPE = "audio/mp4"
+private const val RECORDED_AUDIO_FILENAME_M4A = "recorded.m4a"
+private const val RECORDED_AUDIO_FILENAME_OGG = "recorded.ogg"
+private const val AUDIO_MEDIA_TYPE_M4A = "audio/mp4"
+private const val AUDIO_MEDIA_TYPE_OGG = "audio/ogg"
 private const val IME_SWITCH_OPTION_AVAILABILITY_API_LEVEL = 28
 
 class WhisperInputService : InputMethodService() {
@@ -50,6 +52,8 @@ class WhisperInputService : InputMethodService() {
     private val whisperTranscriber: WhisperTranscriber = WhisperTranscriber()
     private var recorderManager: RecorderManager? = null
     private var recordedAudioFilename: String = ""
+    private var audioMediaType: String = AUDIO_MEDIA_TYPE_M4A
+    private var useOggFormat: Boolean = false
     private var isFirstTime: Boolean = true
 
     private fun transcriptionCallback(text: String?) {
@@ -64,6 +68,21 @@ class WhisperInputService : InputMethodService() {
         whisperKeyboard.reset()
     }
 
+    private suspend fun updateAudioFormat() {
+        val backend = dataStore.data.map { preferences: Preferences ->
+            preferences[SPEECH_TO_TEXT_BACKEND] ?: getString(R.string.settings_option_openai_api)
+        }.first()
+        
+        useOggFormat = backend == getString(R.string.settings_option_nvidia_nim)
+        if (useOggFormat) {
+            recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME_OGG}"
+            audioMediaType = AUDIO_MEDIA_TYPE_OGG
+        } else {
+            recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME_M4A}"
+            audioMediaType = AUDIO_MEDIA_TYPE_M4A
+        }
+    }
+
     override fun onCreateInputView(): View {
         // Initialize members with regard to this context
         recorderManager = RecorderManager(this)
@@ -72,8 +91,10 @@ class WhisperInputService : InputMethodService() {
         ChineseUtils.preLoad(true, TransType.SIMPLE_TO_TAIWAN)
         ChineseUtils.preLoad(true, TransType.TAIWAN_TO_SIMPLE)
 
-        // Assigns the file name for recorded audio
-        recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
+        // Initialize audio format based on backend setting
+        CoroutineScope(Dispatchers.Main).launch {
+            updateAudioFormat()
+        }
 
         // Should offer ime switch?
         val shouldOfferImeSwitch: Boolean =
@@ -116,7 +137,7 @@ class WhisperInputService : InputMethodService() {
             return
         }
 
-        recorderManager!!.start(this, recordedAudioFilename)
+        recorderManager!!.start(this, recordedAudioFilename, useOggFormat)
     }
 
     // when mic amplitude is updated, notify the keyboard
@@ -133,7 +154,7 @@ class WhisperInputService : InputMethodService() {
         recorderManager!!.stop()
         whisperTranscriber.startAsync(this,
             recordedAudioFilename,
-            AUDIO_MEDIA_TYPE,
+            audioMediaType,
             attachToEnd,
             { transcriptionCallback(it) },
             { transcriptionExceptionCallback(it) })
@@ -199,10 +220,12 @@ class WhisperInputService : InputMethodService() {
         whisperKeyboard.reset()
         recorderManager!!.stop()
 
-        // If this is the first time calling onWindowShown, it means this IME is just being switched to
-        // Automatically starts recording after switching to Whisper Input (if settings enabled)
+        // If this is the first time calling onWindowShown, it means this IME is just being switched to.
+        // Automatically starts recording after switching to Whisper Input. (if settings enabled)
         // Dispatch a coroutine to do this task.
         CoroutineScope(Dispatchers.Main).launch {
+            // Update audio format based on current backend setting
+            updateAudioFormat()
             if (!isFirstTime) return@launch
             isFirstTime = false
             val isAutoStartRecording = dataStore.data.map { preferences: Preferences ->
