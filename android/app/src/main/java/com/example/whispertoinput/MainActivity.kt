@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 private const val MICROPHONE_PERMISSION_REQUEST_CODE = 200
 private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 201
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-val REQUEST_STYLE = stringPreferencesKey("request-style")
+val SPEECH_TO_TEXT_BACKEND = stringPreferencesKey("speech-to-text-backend")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val API_KEY = stringPreferencesKey("api-key")
@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
                         isDirty = true
                         btnApply.isEnabled = true
                         // Deal with individual spinner
-                        if (parent.id == R.id.spinner_request_style) {
+                        if (parent.id == R.id.spinner_speech_to_text_backend) {
                             val selectedItem = parent.getItemAtPosition(pos)
                             if (selectedItem == getString(R.string.settings_option_openai_api)) {
                                 val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
@@ -304,7 +304,7 @@ class MainActivity : AppCompatActivity() {
         // Add setting items here to apply functions to them
         CoroutineScope(Dispatchers.Main).launch {
             val settingItems = arrayOf(
-                SettingStringDropdown(R.id.spinner_request_style, REQUEST_STYLE, listOf(
+                SettingStringDropdown(R.id.spinner_speech_to_text_backend, SPEECH_TO_TEXT_BACKEND, listOf(
                     getString(R.string.settings_option_openai_api),
                     getString(R.string.settings_option_whisper_webservice),
                     getString(R.string.settings_option_nvidia_nim)
@@ -318,9 +318,9 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.settings_option_no) to false,
                 )),
                 SettingStringDropdown(R.id.spinner_postprocessing, POSTPROCESSING, listOf(
-                    getString(R.string.settings_option_no_conversion),
+                    getString(R.string.settings_option_to_traditional),
                     getString(R.string.settings_option_to_simplified),
-                    getString(R.string.settings_option_to_traditional)
+                    getString(R.string.settings_option_no_conversion)
                 ), getString(R.string.settings_option_to_traditional)),
             )
             val btnApply: Button = findViewById(R.id.btn_settings_apply)

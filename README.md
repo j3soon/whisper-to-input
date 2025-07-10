@@ -22,7 +22,7 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
    <img src='docs/images/06-record-audio-permission.jpg' width='200'>
    <!-- TODO: Add send notification permission screenshot -->
 
-5. Go to the app settings page and enter your configuration. You have 2 choices, either using the official OpenAI API with [your API key](https://platform.openai.com/api-keys) or self-host a [Whisper ASR Service](https://github.com/ahmetoner/whisper-asr-webservice). For more information, see the [Services](#services) section.
+5. Go to the app settings page and enter your configuration. You have 2 choices, either using the official OpenAI API with [your API key](https://platform.openai.com/api-keys) or self-host a [Whisper ASR Webservice](https://github.com/ahmetoner/whisper-asr-webservice). For more information, see the [Services](#services) section.
 
    <img src='docs/images/08-app-settings-page.jpg' width='200'>
 
@@ -30,25 +30,25 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
 
    - OpenAI API:
      ```
-     Request Style: OpenAI API
-     Endpoint:      https://api.openai.com/v1/audio/transcriptions
+     Speech to Text Backend:  OpenAI API
+     Endpoint:                https://api.openai.com/v1/audio/transcriptions
      Language Code:
-     API Key:       sk-...xxxx
-     Model:         whisper-1
+     API Key:                 sk-...xxxx
+     Model:                   whisper-1
      ```
-   - Whisper ASR Service:
+   - Whisper ASR Webservice:
      ```
-     Request Style: Whisper Webservice
-     Endpoint:      http://<SERVER_IP>:9000/asr
+     Speech to Text Backend:  Whisper ASR Webservice
+     Endpoint:                http://<SERVER_IP>:9000/asr
      Language Code:
      API Key:
      Model:
      ```
    - NVIDIA NIM:
      ```
-     Request Style: NVIDIA NIM
-     Endpoint:      http://<SERVER_IP>:9000/v1/audio/transcriptions
-     Language Code: multi
+     Speech to Text Backend:  NVIDIA NIM
+     Endpoint:                http://<SERVER_IP>:9000/v1/audio/transcriptions
+     Language Code:           multi
      API Key:
      Model:
      ```
@@ -92,11 +92,11 @@ Requires an [OpenAI API key](https://platform.openai.com/api-keys).
 
 See the [documentation](https://platform.openai.com/docs/guides/speech-to-text?lang=curl) for more info.
 
-### Whisper ASR Service
+### Whisper ASR Webservice
 
 The most commonly used open-source self-host whisper service. Requires a self-hosted server.
 
-[Whisper ASR Service](https://github.com/ahmetoner/whisper-asr-webservice) can be set up as described in [#13](https://github.com/j3soon/whisper-to-input/pull/13).
+[Whisper ASR Webservice](https://github.com/ahmetoner/whisper-asr-webservice) can be set up as described in [#13](https://github.com/j3soon/whisper-to-input/pull/13).
 
 ### NVIDIA NIM (Self-hosted)
 
