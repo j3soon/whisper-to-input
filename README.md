@@ -32,25 +32,25 @@ Whisper To Input, also known by its Mandarin name 輕聲細語輸入法, is an A
      ```
      Speech to Text Backend:  OpenAI API
      Endpoint:                https://api.openai.com/v1/audio/transcriptions
-     Language Code:
      API Key:                 sk-...xxxx
      Model:                   whisper-1
+     Language Code:
      ```
    - Whisper ASR Webservice:
      ```
      Speech to Text Backend:  Whisper ASR Webservice
      Endpoint:                http://<SERVER_IP>:9000/asr
-     Language Code:
      API Key:
      Model:
+     Language Code:
      ```
    - NVIDIA NIM:
      ```
      Speech to Text Backend:  NVIDIA NIM
      Endpoint:                http://<SERVER_IP>:9000/v1/audio/transcriptions
-     Language Code:           multi
      API Key:
      Model:
+     Language Code:           multi
      ```
 
 6. Go to the system settings page and enable the app keyboard. This process may vary depending on your Android version and phone model. The following screenshots are taken on Android 13 of a Asus Zenfone 8.
