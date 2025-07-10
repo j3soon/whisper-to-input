@@ -58,6 +58,7 @@ val REQUEST_STYLE = booleanPreferencesKey("is-openai-api-request-style")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val API_KEY = stringPreferencesKey("api-key")
+val MODEL = stringPreferencesKey("model")
 val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
 
 class MainActivity : AppCompatActivity() {
@@ -213,6 +214,8 @@ class MainActivity : AppCompatActivity() {
                             if (selectedItem == getString(R.string.settings_option_openai_api)) {
                                 val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
                                 endpointEditText.setText(getString(R.string.settings_option_openai_api_default_endpoint))
+                                val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
+                                modelEditText.setText(getString(R.string.settings_option_openai_api_default_model))
                             }
                         }
                     }
@@ -255,6 +258,7 @@ class MainActivity : AppCompatActivity() {
                 SettingText(R.id.field_endpoint, ENDPOINT, getString(R.string.settings_option_openai_api_default_endpoint)),
                 SettingText(R.id.field_language_code, LANGUAGE_CODE),
                 SettingText(R.id.field_api_key, API_KEY),
+                SettingText(R.id.field_model, MODEL, getString(R.string.settings_option_openai_api_default_model)),
                 SettingDropdown(R.id.spinner_auto_recording_start, AUTO_RECORDING_START, hashMapOf(
                     getString(R.string.settings_option_yes) to true,
                     getString(R.string.settings_option_no) to false,

@@ -39,7 +39,8 @@ class WhisperTranscriber {
         val endpoint: String,
         val languageCode: String,
         val isRequestStyleOpenaiApi: Boolean,
-        val apiKey: String
+        val apiKey: String,
+        val model: String
     )
 
     private val TAG = "WhisperTranscriber"
@@ -55,12 +56,13 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey) = context.dataStore.data.map { preferences: Preferences ->
+            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey, model) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "auto",
                     preferences[REQUEST_STYLE] ?: true,
-                    preferences[API_KEY] ?: ""
+                    preferences[API_KEY] ?: "",
+                    preferences[MODEL] ?: ""
                 )
             }.first()
 
@@ -77,7 +79,8 @@ class WhisperTranscriber {
                 "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt",
                 mediaType,
                 apiKey,
-                isRequestStyleOpenaiApi
+                isRequestStyleOpenaiApi,
+                model
             )
             val response = client.newCall(request).execute()
 
@@ -139,7 +142,8 @@ class WhisperTranscriber {
         url: String,
         mediaType: String,
         apiKey: String,
-        isRequestStyleOpenaiApi: Boolean
+        isRequestStyleOpenaiApi: Boolean,
+        model: String
     ): Request {
         // Please refer to the following for the endpoint/payload definitions:
         // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
@@ -153,7 +157,7 @@ class WhisperTranscriber {
 
             if (isRequestStyleOpenaiApi) {
                 addFormDataPart("file", "@audio.m4a", fileBody)
-                addFormDataPart("model", "whisper-1")
+                addFormDataPart("model", model)
                 addFormDataPart("response_format", "text")
             }
         }.build()

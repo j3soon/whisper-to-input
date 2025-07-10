@@ -141,6 +141,20 @@
                 style="@style/SettingsField"
                 android:hint="@string/settings_api_key_hint" />
 
+            <!-- Model -->
+            <TextView
+                android:id="@+id/label_model"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_model" />
+            <TextView
+                android:id="@+id/description_model"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_model_desc" />
+            <EditText
+                android:id="@+id/field_model"
+                style="@style/SettingsField"
+                android:hint="@string/settings_model_hint" />
+
             <!-- Auto Recording Start -->
             <TextView
                 android:id="@+id/label_auto_recording_start"
