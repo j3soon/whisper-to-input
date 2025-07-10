@@ -42,7 +42,8 @@ class WhisperTranscriber {
         val speechToTextBackend: String,
         val apiKey: String,
         val model: String,
-        val postprocessing: String
+        val postprocessing: String,
+        val addTrailingSpace: Boolean
     )
 
     private val TAG = "WhisperTranscriber"
@@ -58,14 +59,15 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val (endpoint, languageCode, speechToTextBackend, apiKey, model, postprocessing) = context.dataStore.data.map { preferences: Preferences ->
+            val (endpoint, languageCode, speechToTextBackend, apiKey, model, postprocessing, addTrailingSpace) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "",
                     preferences[SPEECH_TO_TEXT_BACKEND] ?: context.getString(R.string.settings_option_openai_api),
                     preferences[API_KEY] ?: "",
                     preferences[MODEL] ?: "",
-                    preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion)
+                    preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion),
+                    preferences[ADD_TRAILING_SPACE] ?: false
                 )
             }.first()
 
@@ -107,8 +109,13 @@ class WhisperTranscriber {
                 context.getString(R.string.settings_option_to_traditional) -> ChineseUtils.s2tw(rawText)
                 else -> rawText // No conversion
             }
-            
-            return processedText + attachToEnd
+
+            if (attachToEnd == "") {
+                return processedText + if (addTrailingSpace) " " else ""
+            } else {
+                // Only used for space key and enter key.
+                return processedText + attachToEnd
+            }
         }
 
         // Create a cancellable job in the main thread (for UI updating)

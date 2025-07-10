@@ -183,6 +183,20 @@
                 style="@style/SettingsSpinner"
                 android:entries="@array/settings_postprocessing_array" />
 
+            <!-- Add Trailing Space -->
+            <TextView
+                android:id="@+id/label_add_trailing_space"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_add_trailing_space" />
+            <TextView
+                android:id="@+id/description_add_trailing_space"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_add_trailing_space_desc" />
+            <Spinner
+                android:id="@+id/spinner_add_trailing_space"
+                style="@style/SettingsSpinner"
+                android:entries="@array/settings_add_trailing_space_array" />
+
         </LinearLayout>
     </ScrollView>
 

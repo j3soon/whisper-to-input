@@ -167,7 +167,7 @@ curl --request POST \
 this should show:
 
 ```
-{"text":"A cramp is no small danger on a swim. "}
+"A cramp is no small danger on a swim. "
 ```
 
 The following Python package is used in the official guide, but isn't required. We still include these instructions here for reference:
