@@ -37,7 +37,8 @@
     <string name="settings_option_whisper_webservice_default_model"></string> <!-- Empty default model -->
     <string name="settings_option_nvidia_nim">NVIDIA NIM</string>
     <string name="settings_option_nvidia_nim_default_endpoint">http://localhost:9000/v1/audio/transcriptions</string>
-    <string name="settings_option_nvidia_nim_default_model">multi</string>
+    <string name="settings_option_nvidia_nim_default_model"></string> <!-- Empty default model -->
+    <string name="settings_option_nvidia_nim_default_language">multi</string> <!-- Empty default language -->
     <string-array name="settings_speech_to_text_backend_array">
         <item>@string/settings_option_openai_api</item>
         <item>@string/settings_option_whisper_webservice</item>

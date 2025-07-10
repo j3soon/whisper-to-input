@@ -271,6 +271,8 @@ class MainActivity : AppCompatActivity() {
                                 endpointEditText.setText(getString(R.string.settings_option_nvidia_nim_default_endpoint))
                                 val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
                                 modelEditText.setText(getString(R.string.settings_option_nvidia_nim_default_model))
+                                val languageCodeEditText: EditText = findViewById<EditText>(R.id.field_language_code)
+                                languageCodeEditText.setText(getString(R.string.settings_option_nvidia_nim_default_language))
                             }
                         }
                     }

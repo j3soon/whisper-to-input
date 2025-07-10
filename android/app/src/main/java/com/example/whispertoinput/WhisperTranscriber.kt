@@ -79,10 +79,11 @@ class WhisperTranscriber {
             val request = buildWhisperRequest(
                 context,
                 filename,
-                "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt",
                 mediaType,
-                apiKey,
                 speechToTextBackend,
+                endpoint,
+                languageCode,
+                apiKey,
                 model
             )
             val response = client.newCall(request).execute()
@@ -149,10 +150,11 @@ class WhisperTranscriber {
     private fun buildWhisperRequest(
         context: Context,
         filename: String,
-        url: String,
         mediaType: String,
-        apiKey: String,
         speechToTextBackend: String,
+        endpoint: String,
+        languageCode: String,
+        apiKey: String,
         model: String
     ): Request {
         // Please refer to the following for the endpoint/payload definitions:
@@ -164,15 +166,20 @@ class WhisperTranscriber {
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
             setType(MultipartBody.FORM)
+            // Add file to payload
             if (speechToTextBackend == context.getString(R.string.settings_option_openai_api) || 
                 speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim)) {
                 addFormDataPart("file", "@audio.m4a", fileBody)
             } else if (speechToTextBackend == context.getString(R.string.settings_option_whisper_webservice)) {
                 addFormDataPart("audio_file", "@audio.m4a", fileBody)
             }
+            // Add backend-specific parameters to payload
             if (speechToTextBackend == context.getString(R.string.settings_option_openai_api)) {
                 addFormDataPart("model", model)
                 addFormDataPart("response_format", "text")
+            }
+            if (speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim)) {
+                addFormDataPart("language", languageCode)
             }
         }.build()
 
@@ -186,6 +193,15 @@ class WhisperTranscriber {
             }
             add("Content-Type", "multipart/form-data")
         }.build()
+
+        // Build URL with endpoint-specific parameters
+        val url = when (speechToTextBackend) {
+            context.getString(R.string.settings_option_openai_api),
+            context.getString(R.string.settings_option_whisper_webservice) -> {
+                "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt"
+            }
+            else -> endpoint
+        }
 
         return Request.Builder()
             .headers(requestHeaders)
