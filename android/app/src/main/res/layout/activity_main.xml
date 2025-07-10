@@ -169,6 +169,20 @@
                 style="@style/SettingsSpinner"
                 android:entries="@array/settings_auto_recording_start_array" />
 
+            <!-- Postprocessing -->
+            <TextView
+                android:id="@+id/label_postprocessing"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_postprocessing" />
+            <TextView
+                android:id="@+id/description_postprocessing"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_postprocessing_desc" />
+            <Spinner
+                android:id="@+id/spinner_postprocessing"
+                style="@style/SettingsSpinner"
+                android:entries="@array/settings_postprocessing_array" />
+
         </LinearLayout>
     </ScrollView>
 

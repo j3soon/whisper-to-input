@@ -54,7 +54,7 @@ class WhisperInputService : InputMethodService() {
 
     private fun transcriptionCallback(text: String?) {
         if (!text.isNullOrEmpty()) {
-            currentInputConnection?.commitText(ChineseUtils.s2tw(text), 1)
+            currentInputConnection?.commitText(text, 1)
         }
         whisperKeyboard.reset()
     }
@@ -70,6 +70,7 @@ class WhisperInputService : InputMethodService() {
 
         // Preload conversion table
         ChineseUtils.preLoad(true, TransType.SIMPLE_TO_TAIWAN)
+        ChineseUtils.preLoad(true, TransType.TAIWAN_TO_SIMPLE)
 
         // Assigns the file name for recorded audio
         recordedAudioFilename = "${externalCacheDir?.absolutePath}/${RECORDED_AUDIO_FILENAME}"
