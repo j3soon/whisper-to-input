@@ -163,9 +163,9 @@ class WhisperTranscriber {
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
             setType(MultipartBody.FORM)
-            addFormDataPart("audio_file", "@audio.m4a", fileBody)
-
-            if (isRequestStyleOpenaiApi) {
+            if (!isRequestStyleOpenaiApi) {
+                addFormDataPart("audio_file", "@audio.m4a", fileBody)
+            } else {
                 addFormDataPart("file", "@audio.m4a", fileBody)
                 addFormDataPart("model", model)
                 addFormDataPart("response_format", "text")
