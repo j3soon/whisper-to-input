@@ -158,10 +158,28 @@ class WhisperTranscriber {
         model: String
     ): Request {
         // Please refer to the following for the endpoint/payload definitions:
-        // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
+        // OpenAI API:
         // - https://platform.openai.com/docs/api-reference/audio/createTranscription
         // - https://platform.openai.com/docs/api-reference/making-requests
-        // - NVIDIA NIM doesn't have documentation for HTTP-style requests.
+        // Whisper ASR WebService:
+        // - https://ahmetoner.com/whisper-asr-webservice/run/#usage
+        // NVIDIA NIM:
+        // - No public documentation for HTTP-style requests.
+        // - Source code at `/opt/nim/inference.py` in docker container `nvcr.io/nim/nvidia/riva-asr:1.3.0`.
+        /*
+            ...
+            @HttpNIMApiInterface.route('/v1/audio/transcriptions', methods=["post"])
+            async def transcriptions(
+                self,
+                file: UploadFile = File(...),
+                model: Optional[str] = Form(None),
+                language: Optional[str] = Form(None),
+                prompt: Optional[str] = Form(None),
+                response_format: Optional[str] = Form(None),
+                temperature: Optional[float] = Form(None),
+            ):
+            ...
+         */
         val file: File = File(filename)
         val fileBody: RequestBody = file.asRequestBody(mediaType.toMediaTypeOrNull())
         val requestBody: RequestBody = MultipartBody.Builder().apply {
@@ -180,6 +198,7 @@ class WhisperTranscriber {
             }
             if (speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim)) {
                 addFormDataPart("language", languageCode)
+                addFormDataPart("response_format", "text")
             }
         }.build()
 
