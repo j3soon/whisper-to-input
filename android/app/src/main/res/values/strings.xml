@@ -57,11 +57,17 @@
     <string name="settings_model">Model</string>
     <string name="settings_model_desc">The model to use for transcription (e.g., whisper-1).</string>
     <string name="settings_model_hint">Enter model name (e.g., whisper-1)</string>
-    <string name="settings_auto_recording_start">Auto Recording Start</string>
-    <string name="settings_auto_recording_start_desc">Whether to automatically start recording upon opening the keyboard.</string>
     <string name="settings_option_yes">Yes</string>
     <string name="settings_option_no">No</string>
+    <string name="settings_auto_recording_start">Auto Recording Start</string>
+    <string name="settings_auto_recording_start_desc">Whether to automatically start recording upon opening the keyboard.</string>
     <string-array name="settings_auto_recording_start_array">
+        <item>@string/settings_option_yes</item>
+        <item>@string/settings_option_no</item>
+    </string-array>
+    <string name="settings_add_trailing_space">Add Trailing Space</string>
+    <string name="settings_add_trailing_space_desc">Whether to add a trailing space after the transcribed text.</string>
+    <string-array name="settings_add_trailing_space_array">
         <item>@string/settings_option_yes</item>
         <item>@string/settings_option_no</item>
     </string-array>
