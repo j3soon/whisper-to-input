@@ -57,6 +57,16 @@
         <item>@string/settings_option_yes</item>
         <item>@string/settings_option_no</item>
     </string-array>
+    <string name="settings_postprocessing">Postprocessing</string>
+    <string name="settings_postprocessing_desc">Choose how to handle text postprocessing.</string>
+    <string name="settings_option_to_traditional">Convert to Traditional Chinese</string>
+    <string name="settings_option_to_simplified">Convert to Simplified Chinese</string>
+    <string name="settings_option_no_conversion">No Conversion</string>
+    <string-array name="settings_postprocessing_array">
+        <item>@string/settings_option_to_traditional</item>
+        <item>@string/settings_option_to_simplified</item>
+        <item>@string/settings_option_no_conversion</item>
+    </string-array>
     <string name="desc_space_bar">Space Bar</string>
 
 </resources>

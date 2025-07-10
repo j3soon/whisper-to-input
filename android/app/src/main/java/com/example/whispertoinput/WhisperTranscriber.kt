@@ -33,6 +33,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import com.github.liuyueyi.quick.transfer.ChineseUtils
 
 class WhisperTranscriber {
     private data class Config(
@@ -40,7 +41,8 @@ class WhisperTranscriber {
         val languageCode: String,
         val isRequestStyleOpenaiApi: Boolean,
         val apiKey: String,
-        val model: String
+        val model: String,
+        val postprocessing: String
     )
 
     private val TAG = "WhisperTranscriber"
@@ -56,13 +58,14 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey, model) = context.dataStore.data.map { preferences: Preferences ->
+            val (endpoint, languageCode, isRequestStyleOpenaiApi, apiKey, model, postprocessing) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "auto",
                     preferences[REQUEST_STYLE] ?: true,
                     preferences[API_KEY] ?: "",
-                    preferences[MODEL] ?: ""
+                    preferences[MODEL] ?: "",
+                    preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion)
                 )
             }.first()
 
@@ -89,7 +92,14 @@ class WhisperTranscriber {
                 throw Exception(response.body!!.string().replace('\n', ' '))
             }
 
-            return response.body!!.string().trim() + attachToEnd
+            val rawText = response.body!!.string().trim()
+            val processedText = when (postprocessing) {
+                context.getString(R.string.settings_option_to_simplified) -> ChineseUtils.tw2s(rawText)
+                context.getString(R.string.settings_option_to_traditional) -> ChineseUtils.s2tw(rawText)
+                else -> rawText // No conversion
+            }
+            
+            return processedText + attachToEnd
         }
 
         // Create a cancellable job in the main thread (for UI updating)

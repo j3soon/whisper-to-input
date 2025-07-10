@@ -60,6 +60,7 @@ val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val API_KEY = stringPreferencesKey("api-key")
 val MODEL = stringPreferencesKey("model")
 val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
+val POSTPROCESSING = stringPreferencesKey("postprocessing")
 
 class MainActivity : AppCompatActivity() {
     private var setupSettingItemsDone: Boolean = false
@@ -246,6 +247,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    inner class SettingStringDropdown(
+        private val viewId: Int,
+        private val preferenceKey: Preferences.Key<String>,
+        private val optionValues: List<String>,
+        private val defaultValue: String = ""
+    ): SettingItem() {
+        override fun setup(): Job {
+            return CoroutineScope(Dispatchers.Main).launch {
+                val btnApply: Button = findViewById(R.id.btn_settings_apply)
+                val spinner = findViewById<Spinner>(viewId)
+                spinner.isEnabled = false
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
+                        if (!setupSettingItemsDone) return
+                        isDirty = true
+                        btnApply.isEnabled = true
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>) { }
+                }
+
+                // Read data. If none, apply default value.
+                val settingValue: String? = readSetting(preferenceKey)
+                val value: String = settingValue ?: defaultValue
+                if (settingValue == null) {
+                    writeSetting(preferenceKey, defaultValue)
+                }
+                val index: Int? = (0 until spinner.adapter.count).firstOrNull {
+                    spinner.adapter.getItem(it) == value
+                }
+                spinner.setSelection(index ?: 0, false)
+                spinner.isEnabled = true
+            }
+        }
+        override suspend fun apply() {
+            if (!isDirty) return
+            val selectedItem = findViewById<Spinner>(viewId).selectedItem
+            val newValue: String = selectedItem.toString()
+            writeSetting(preferenceKey, newValue)
+            isDirty = false
+        }
+    }
+
     private fun setupSettingItems() {
         setupSettingItemsDone = false
         // Add setting items here to apply functions to them
@@ -263,6 +306,11 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.settings_option_yes) to true,
                     getString(R.string.settings_option_no) to false,
                 )),
+                SettingStringDropdown(R.id.spinner_postprocessing, POSTPROCESSING, listOf(
+                    getString(R.string.settings_option_no_conversion),
+                    getString(R.string.settings_option_to_simplified),
+                    getString(R.string.settings_option_to_traditional)
+                ), getString(R.string.settings_option_to_traditional)),
             )
             val btnApply: Button = findViewById(R.id.btn_settings_apply)
             btnApply.isEnabled = false
