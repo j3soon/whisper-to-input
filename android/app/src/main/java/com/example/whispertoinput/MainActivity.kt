@@ -261,11 +261,11 @@ class MainActivity : AppCompatActivity() {
                                 endpointEditText.setText(getString(R.string.settings_option_openai_api_default_endpoint))
                                 val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
                                 modelEditText.setText(getString(R.string.settings_option_openai_api_default_model))
-                            } else if (selectedItem == getString(R.string.settings_option_whisper_webservice)) {
+                            } else if (selectedItem == getString(R.string.settings_option_whisper_asr_webservice)) {
                                 val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
-                                endpointEditText.setText(getString(R.string.settings_option_whisper_webservice_default_endpoint))
+                                endpointEditText.setText(getString(R.string.settings_option_whisper_asr_webservice_default_endpoint))
                                 val modelEditText: EditText = findViewById<EditText>(R.id.field_model)
-                                modelEditText.setText(getString(R.string.settings_option_whisper_webservice_default_model))
+                                modelEditText.setText(getString(R.string.settings_option_whisper_asr_webservice_default_model))
                             } else if (selectedItem == getString(R.string.settings_option_nvidia_nim)) {
                                 val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
                                 endpointEditText.setText(getString(R.string.settings_option_nvidia_nim_default_endpoint))
@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity() {
             val settingItems = arrayOf(
                 SettingStringDropdown(R.id.spinner_speech_to_text_backend, SPEECH_TO_TEXT_BACKEND, listOf(
                     getString(R.string.settings_option_openai_api),
-                    getString(R.string.settings_option_whisper_webservice),
+                    getString(R.string.settings_option_whisper_asr_webservice),
                     getString(R.string.settings_option_nvidia_nim)
                 ), getString(R.string.settings_option_openai_api)),
                 SettingText(R.id.field_endpoint, ENDPOINT, getString(R.string.settings_option_openai_api_default_endpoint)),

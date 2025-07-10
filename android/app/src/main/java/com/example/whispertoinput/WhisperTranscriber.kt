@@ -170,7 +170,7 @@ class WhisperTranscriber {
             if (speechToTextBackend == context.getString(R.string.settings_option_openai_api) || 
                 speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim)) {
                 addFormDataPart("file", "@audio.m4a", fileBody)
-            } else if (speechToTextBackend == context.getString(R.string.settings_option_whisper_webservice)) {
+            } else if (speechToTextBackend == context.getString(R.string.settings_option_whisper_asr_webservice)) {
                 addFormDataPart("audio_file", "@audio.m4a", fileBody)
             }
             // Add backend-specific parameters to payload
@@ -197,7 +197,7 @@ class WhisperTranscriber {
         // Build URL with endpoint-specific parameters
         val url = when (speechToTextBackend) {
             context.getString(R.string.settings_option_openai_api),
-            context.getString(R.string.settings_option_whisper_webservice) -> {
+            context.getString(R.string.settings_option_whisper_asr_webservice) -> {
                 "$endpoint?encode=true&task=transcribe&language=$languageCode&word_timestamps=false&output=txt"
             }
             else -> endpoint
