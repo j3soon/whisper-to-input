@@ -93,7 +93,15 @@ class WhisperTranscriber {
                 throw Exception(response.body!!.string().replace('\n', ' '))
             }
 
-            val rawText = response.body!!.string().trim()
+            var rawText = response.body!!.string().trim()
+            
+            // For NVIDIA NIM, remove quotes if they wrap the text
+            // Not sure if this is a bug or a feature...
+            if (speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim) && 
+                rawText.startsWith("\"") && rawText.endsWith("\"")) {
+                rawText = rawText.substring(1, rawText.length - 1).trim()
+            }
+            
             val processedText = when (postprocessing) {
                 context.getString(R.string.settings_option_to_simplified) -> ChineseUtils.tw2s(rawText)
                 context.getString(R.string.settings_option_to_traditional) -> ChineseUtils.s2tw(rawText)
