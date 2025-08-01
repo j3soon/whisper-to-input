@@ -65,6 +65,12 @@
         <item>@string/settings_option_yes</item>
         <item>@string/settings_option_no</item>
     </string-array>
+    <string name="settings_auto_switch_back">Auto Switch Back</string>
+    <string name="settings_auto_switch_back_desc">Automatically switch back to the previous keyboard after transcription.</string>
+    <string-array name="settings_auto_switch_back_array">
+        <item>@string/settings_option_yes</item>
+        <item>@string/settings_option_no</item>
+    </string-array>
     <string name="settings_add_trailing_space">Add Trailing Space</string>
     <string name="settings_add_trailing_space_desc">Whether to add a trailing space after the transcribed text.</string>
     <string-array name="settings_add_trailing_space_array">
