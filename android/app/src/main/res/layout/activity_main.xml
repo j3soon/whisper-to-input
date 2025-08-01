@@ -155,6 +155,7 @@
                 style="@style/SettingsField"
                 android:hint="@string/settings_language_code_hint" />
 
+
             <!-- Auto Recording Start -->
             <TextView
                 android:id="@+id/label_auto_recording_start"
@@ -168,6 +169,20 @@
                 android:id="@+id/spinner_auto_recording_start"
                 style="@style/SettingsSpinner"
                 android:entries="@array/settings_auto_recording_start_array" />
+
+            <!-- Auto Switch Back -->
+            <TextView
+                android:id="@+id/label_auto_switch_back"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_auto_switch_back" />
+            <TextView
+                android:id="@+id/description_auto_switch_back"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_auto_switch_back_desc" />
+            <Spinner
+                android:id="@+id/spinner_auto_switch_back"
+                style="@style/SettingsSpinner"
+                android:entries="@array/settings_auto_switch_back_array" />
 
             <!-- Postprocessing -->
             <TextView

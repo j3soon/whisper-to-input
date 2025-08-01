@@ -59,6 +59,15 @@ class WhisperInputService : InputMethodService() {
     private fun transcriptionCallback(text: String?) {
         if (!text.isNullOrEmpty()) {
             currentInputConnection?.commitText(text, 1)
+            // Check if auto-switch-back is enabled and switch if so
+            CoroutineScope(Dispatchers.Main).launch {
+                val autoSwitchBack = dataStore.data.map { preferences: Preferences ->
+                    preferences[AUTO_SWITCH_BACK] ?: false
+                }.first()
+                if (autoSwitchBack) {
+                    onSwitchIme()
+                }
+            }
         }
         whisperKeyboard.reset()
     }
