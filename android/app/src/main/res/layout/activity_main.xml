@@ -127,6 +127,20 @@
                 style="@style/SettingsField"
                 android:hint="@string/settings_api_key_hint" />
 
+            <!-- Gemini API Key -->
+            <TextView
+                android:id="@+id/label_gemini_api_key"
+                style="@style/SettingsLabel"
+                android:text="@string/settings_gemini_api_key" />
+            <TextView
+                android:id="@+id/description_gemini_api_key"
+                style="@style/SettingsDescription"
+                android:text="@string/settings_gemini_api_key_desc" />
+            <EditText
+                android:id="@+id/field_gemini_api_key"
+                style="@style/SettingsField"
+                android:hint="@string/settings_gemini_api_key_hint" />
+
             <!-- Model -->
             <TextView
                 android:id="@+id/label_model"

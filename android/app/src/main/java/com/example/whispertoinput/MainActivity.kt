@@ -58,6 +58,7 @@ val SPEECH_TO_TEXT_BACKEND = stringPreferencesKey("speech-to-text-backend")
 val ENDPOINT = stringPreferencesKey("endpoint")
 val LANGUAGE_CODE = stringPreferencesKey("language-code")
 val API_KEY = stringPreferencesKey("api-key")
+val GEMINI_API_KEY = stringPreferencesKey("gemini-api-key")
 val MODEL = stringPreferencesKey("model")
 val AUTO_RECORDING_START = booleanPreferencesKey("is-auto-recording-start")
 val AUTO_SWITCH_BACK = booleanPreferencesKey("auto-switch-back")
@@ -285,6 +286,9 @@ class MainActivity : AppCompatActivity() {
                                 modelEditText.setText(getString(R.string.settings_option_nvidia_nim_default_model))
                                 val languageCodeEditText: EditText = findViewById<EditText>(R.id.field_language_code)
                                 languageCodeEditText.setText(getString(R.string.settings_option_nvidia_nim_default_language))
+                            } else if (selectedItem == getString(R.string.settings_option_gemini_api)) {
+                                val endpointEditText: EditText = findViewById<EditText>(R.id.field_endpoint)
+                                endpointEditText.setText(getString(R.string.settings_option_gemini_api_default_endpoint))
                             }
                         }
                     }
@@ -321,11 +325,13 @@ class MainActivity : AppCompatActivity() {
                 SettingStringDropdown(R.id.spinner_speech_to_text_backend, SPEECH_TO_TEXT_BACKEND, listOf(
                     getString(R.string.settings_option_openai_api),
                     getString(R.string.settings_option_whisper_asr_webservice),
-                    getString(R.string.settings_option_nvidia_nim)
+                    getString(R.string.settings_option_nvidia_nim),
+                    getString(R.string.settings_option_gemini_api)
                 ), getString(R.string.settings_option_openai_api)),
                 SettingText(R.id.field_endpoint, ENDPOINT, getString(R.string.settings_option_openai_api_default_endpoint)),
                 SettingText(R.id.field_language_code, LANGUAGE_CODE, getString(R.string.settings_option_openai_api_default_language)),
                 SettingText(R.id.field_api_key, API_KEY),
+                SettingText(R.id.field_gemini_api_key, GEMINI_API_KEY),
                 SettingText(R.id.field_model, MODEL, getString(R.string.settings_option_openai_api_default_model)),
                 SettingDropdown(R.id.spinner_auto_recording_start, AUTO_RECORDING_START, hashMapOf(
                     getString(R.string.settings_option_yes) to true,

@@ -153,6 +153,10 @@ class WhisperKeyboard {
         setKeyboardStatus(KeyboardStatus.Idle)
     }
 
+    fun updateStatusText(text: String) {
+        labelStatus?.text = text
+    }
+
     fun updateMicrophoneAmplitude(amplitude: Int) {
         if (keyboardStatus != KeyboardStatus.Recording) {
             return

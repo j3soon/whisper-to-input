@@ -20,19 +20,25 @@
 package com.example.whispertoinput
 
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.Headers
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
+import java.util.concurrent.TimeUnit
 import com.github.liuyueyi.quick.transfer.ChineseUtils
 
 class WhisperTranscriber {
@@ -245,5 +251,141 @@ class WhisperTranscriber {
             .url(url)
             .post(requestBody)
             .build()
+    }
+
+    suspend fun transcribeWithGemini(
+        audioFile: File,
+        apiKey: String
+    ): String = withContext(Dispatchers.IO) {
+        Log.d(TAG, "Transcribing with Gemini: ${audioFile.name}")
+
+        val audioData = audioFile.readBytes()
+        val base64Audio = Base64.encodeToString(audioData, Base64.NO_WRAP)
+
+        val jsonBody = JSONObject().apply {
+            put("contents", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("parts", JSONArray().apply {
+                        put(JSONObject().put("text", "Transcribe this audio. Return only the transcribed text with no additional commentary."))
+                        put(JSONObject().apply {
+                            put("inline_data", JSONObject().apply {
+                                put("mime_type", "audio/mp4")
+                                put("data", base64Audio)
+                            })
+                        })
+                    })
+                })
+            })
+        }
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        val request = Request.Builder()
+            .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey")
+            .post(jsonBody.toString().toRequestBody("application/json".toMediaType()))
+            .build()
+
+        val response = client.newCall(request).execute()
+
+        if (!response.isSuccessful || response.code / 100 != 2) {
+            val errorBody = response.body?.string() ?: "Unknown error"
+            throw Exception("Gemini API error (${response.code}): $errorBody")
+        }
+
+        val responseBody = response.body?.string() ?: throw Exception("Empty response from Gemini API")
+        val json = JSONObject(responseBody)
+
+        val text = json.getJSONArray("candidates")
+            .getJSONObject(0)
+            .getJSONObject("content")
+            .getJSONArray("parts")
+            .getJSONObject(0)
+            .getString("text")
+            .trim()
+
+        Log.d(TAG, "Gemini transcription result: ${text.take(100)}...")
+        text
+    }
+
+    /**
+     * Transcribe a single audio chunk using the configured backend.
+     * This is a backend-agnostic function that routes to the appropriate API.
+     * Returns raw transcription text (no postprocessing applied).
+     */
+    suspend fun transcribeChunk(
+        context: Context,
+        audioFile: File,
+        mediaType: String
+    ): String = withContext(Dispatchers.IO) {
+        // Retrieve configs
+        val (endpoint, languageCode, speechToTextBackend, apiKey, model, _, _) = context.dataStore.data.map { preferences: Preferences ->
+            Config(
+                preferences[ENDPOINT] ?: "",
+                preferences[LANGUAGE_CODE] ?: "",
+                preferences[SPEECH_TO_TEXT_BACKEND] ?: context.getString(R.string.settings_option_openai_api),
+                preferences[API_KEY] ?: "",
+                preferences[MODEL] ?: "",
+                preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion),
+                preferences[ADD_TRAILING_SPACE] ?: false
+            )
+        }.first()
+
+        Log.d(TAG, "Transcribing chunk with backend: $speechToTextBackend")
+
+        // Route to appropriate backend
+        when (speechToTextBackend) {
+            context.getString(R.string.settings_option_gemini_api) -> {
+                val geminiApiKey = context.dataStore.data.map { preferences: Preferences ->
+                    preferences[GEMINI_API_KEY] ?: ""
+                }.first()
+                if (geminiApiKey.isEmpty()) {
+                    throw Exception(context.getString(R.string.error_gemini_apikey_unset))
+                }
+                transcribeWithGemini(audioFile, geminiApiKey)
+            }
+            else -> {
+                // OpenAI, Whisper ASR, NVIDIA NIM - use existing HTTP multipart flow
+                if (endpoint.isEmpty()) {
+                    throw Exception(context.getString(R.string.error_endpoint_unset))
+                }
+
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .build()
+
+                val request = buildWhisperRequest(
+                    context,
+                    audioFile.absolutePath,
+                    mediaType,
+                    speechToTextBackend,
+                    endpoint,
+                    languageCode,
+                    apiKey,
+                    model
+                )
+
+                val response = client.newCall(request).execute()
+
+                if (!response.isSuccessful || response.code / 100 != 2) {
+                    throw Exception(response.body?.string()?.replace('\n', ' ') ?: "Unknown error")
+                }
+
+                var rawText = response.body?.string()?.trim() ?: ""
+
+                // For NVIDIA NIM, remove quotes if they wrap the text
+                if (speechToTextBackend == context.getString(R.string.settings_option_nvidia_nim) &&
+                    rawText.startsWith("\"") && rawText.endsWith("\"")) {
+                    rawText = rawText.substring(1, rawText.length - 1).trim()
+                }
+
+                rawText
+            }
+        }
     }
 }
