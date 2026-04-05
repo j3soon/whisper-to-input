@@ -30,6 +30,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.util.concurrent.TimeUnit
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
@@ -41,6 +42,7 @@ class WhisperTranscriber {
         val languageCode: String,
         val speechToTextBackend: String,
         val apiKey: String,
+        val apiTimeout: String,
         val model: String,
         val postprocessing: String,
         val addTrailingSpace: Boolean
@@ -59,12 +61,13 @@ class WhisperTranscriber {
     ) {
         suspend fun makeWhisperRequest(): String {
             // Retrieve configs
-            val (endpoint, languageCode, speechToTextBackend, apiKey, model, postprocessing, addTrailingSpace) = context.dataStore.data.map { preferences: Preferences ->
+            val (endpoint, languageCode, speechToTextBackend, apiKey, apiTimeout, model, postprocessing, addTrailingSpace) = context.dataStore.data.map { preferences: Preferences ->
                 Config(
                     preferences[ENDPOINT] ?: "",
                     preferences[LANGUAGE_CODE] ?: "",
                     preferences[SPEECH_TO_TEXT_BACKEND] ?: context.getString(R.string.settings_option_openai_api),
                     preferences[API_KEY] ?: "",
+                    preferences[API_TIMEOUT] ?: "60",
                     preferences[MODEL] ?: "",
                     preferences[POSTPROCESSING] ?: context.getString(R.string.settings_option_no_conversion),
                     preferences[ADD_TRAILING_SPACE] ?: false
@@ -76,8 +79,13 @@ class WhisperTranscriber {
                 throw Exception(context.getString(R.string.error_endpoint_unset))
             }
 
-            // Make request
-            val client = OkHttpClient()
+            // Make request with configured timeout
+            val timeoutSeconds = apiTimeout.toIntOrNull()?.takeIf { it > 0 } ?: 60
+            val client = OkHttpClient.Builder()
+                .connectTimeout(timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .readTimeout(timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .writeTimeout(timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .build()
             val request = buildWhisperRequest(
                 context,
                 filename,

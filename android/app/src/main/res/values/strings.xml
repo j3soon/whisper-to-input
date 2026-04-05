@@ -48,6 +48,9 @@
     <string name="settings_endpoint">Endpoint</string>
     <string name="settings_endpoint_desc">The host and port for the OpenAI API, Whisper ASR Webservice, or NVIDIA NIM endpoint.</string>
     <string name="settings_endpoint_hint"><![CDATA[e.g., http://<host>:<port>/asr]]></string>
+    <string name="settings_api_timeout">API Timeout (seconds)</string>
+    <string name="settings_api_timeout_desc">Maximum time to wait for the API response before timing out. Set to 0 to use the default (30s).</string>
+    <string name="settings_api_timeout_hint">Enter timeout in seconds (e.g., 60)</string>
     <string name="settings_language_code">Language Code</string>
     <string name="settings_language_code_desc">The language code to be included in the request payload (e.g., en, zh).</string>
     <string name="settings_language_code_hint">Enter Language Code (e.g., en, zh)</string>
